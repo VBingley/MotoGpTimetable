@@ -2,6 +2,7 @@ package nl.bingley.motogptimetable;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.view.View;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -89,9 +90,13 @@ public class TableUpdater extends Thread {
 
 		setRowBackgroundColor(row, rider);
 
-		row.addView(createRiderTextView(row.getContext(), TimingSheetUtils.getRiderPositionString(rider)));
+		TextView positionTextView = createRiderTextView(row.getContext(), TimingSheetUtils.getRiderPositionString(rider));
+		positionTextView.setTypeface(Typeface.MONOSPACE);
+		row.addView(positionTextView);
 		row.addView(createRiderTextView(row.getContext(), String.valueOf(rider.getNumber())));
-		row.addView(createRiderTextView(row.getContext(), rider.getName().charAt(0) + " " + rider.getSurname().substring(0,3)));
+		TextView nameTextView = createRiderTextView(row.getContext(), rider.getName().charAt(0) + " " + rider.getSurname().substring(0, 3));
+		nameTextView.setTypeface(Typeface.MONOSPACE);
+		row.addView(nameTextView);
 		row.addView(createRiderTextView(row.getContext(), rider.getLaptime()));
 		row.addView(createRiderTextView(row.getContext(), rider.getLastTime()));
 		row.addView(createRiderTextView(row.getContext(), rider.getLeadGap()));

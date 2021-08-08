@@ -28,10 +28,14 @@ public class TimingSheetUtils {
 	}
 
 	public static String getRiderPositionString(Rider rider) {
+		String position = String.valueOf(rider.getPosition());
+		if (position.length() == 1) {
+			position += ' ';
+		}
 		if (hasLostPosition(rider)) {
-			return "v " + rider.getPosition();
+			return "v " + position;
 		} else if (hasGainedPosition(rider)) {
-			return  "^ " + rider.getPosition();
+			return  "^ " + position;
 		} else {
 			return String.valueOf(rider.getPosition());
 		}
