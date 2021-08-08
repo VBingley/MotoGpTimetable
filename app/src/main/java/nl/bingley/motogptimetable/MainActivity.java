@@ -4,6 +4,7 @@ import android.os.Bundle;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
+import com.google.android.material.snackbar.Snackbar;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -48,6 +49,8 @@ public class MainActivity extends AppCompatActivity {
 
 		//noinspection SimplifiableIfStatement
 		if (id == R.id.action_settings) {
+			Snackbar.make(binding.toolbar, "There are no settings, maybe later.", Snackbar.LENGTH_LONG)
+					.setAction("Action", null).show();
 			return true;
 		}
 
