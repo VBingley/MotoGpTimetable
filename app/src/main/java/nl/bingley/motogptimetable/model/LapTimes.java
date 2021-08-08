@@ -31,6 +31,6 @@ public class LapTimes {
 
 	@Override
 	public String toString() {
-		return riders.values().stream().map(rider -> rider.toString(rider.getPosition())).reduce("", (rider1,rider2) -> rider1 + "\n" + rider2);
+		return riders.values().stream().map(Rider::toString).reduce("", (rider1, rider2) -> rider1 + "\n" + rider2);
 	}
 }

@@ -3,6 +3,8 @@ package nl.bingley.motogptimetable.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.time.LocalDateTime;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Rider {
 	@JsonProperty("rider_number")
@@ -22,8 +24,14 @@ public class Rider {
 	@JsonProperty("gap_prev")
 	private String previousGap;
 
-	private String positionString;
-	
+	private int lastPosition;
+	private LocalDateTime lastPositionChange;
+
+	public Rider() {
+		lastPosition = -1;
+		lastPositionChange = LocalDateTime.now();
+	}
+
 	public void setNumber(int number) {
 		this.number = number;
 	}
@@ -100,29 +108,23 @@ public class Rider {
 		return previousGap;
 	}
 
-	public String getPositionString() {
-		return positionString;
+	public String toString() {
+		return String.join(" \t", Integer.toString(position), Integer.toString(number), getLaptime(), getLastTime(), getLeadGap(), getPreviousGap(), name.charAt(0) + " " + surname);
 	}
 
-	public void setPositionString(String positionString) {
-		this.positionString = positionString;
+	public int getLastPosition() {
+		return lastPosition;
 	}
 
-	public String toString(int previousPosition) {
-		return String.join(" \t", getPositionString(previousPosition), Integer.toString(number), getLaptime(), getLastTime(), getLeadGap(), getPreviousGap(), name.charAt(0) + " " + surname);
+	public void setLastPosition(int lastPosition) {
+		this.lastPosition = lastPosition;
 	}
-	
-	public String getPositionString(int previousPosition) {
-		if(positionString != null) {
-			return positionString;
-		}
-		if (previousPosition < position) {
-			positionString = "v " + position;
-		} else if (previousPosition > position) {
-			positionString = "^ " + position;
-		} else {
-			positionString = "- " + position;
-		}
-		return positionString;
+
+	public LocalDateTime getLastPositionChange() {
+		return lastPositionChange;
+	}
+
+	public void setLastPositionChange(LocalDateTime lastPositionChange) {
+		this.lastPositionChange = lastPositionChange;
 	}
 }

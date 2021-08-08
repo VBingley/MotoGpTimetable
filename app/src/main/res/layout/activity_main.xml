@@ -16,15 +16,21 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
-            app:popupTheme="@style/Theme.MotoGPTimetable.PopupOverlay" />
+            app:popupTheme="@style/AppTheme" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <TableLayout
-        android:id="@+id/table"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
+        android:scrollbars="none"
         android:translationY="?attr/actionBarSize"
-        android:stretchColumns="*"/>
+        android:layout_weight="1">
+        <TableLayout
+            android:id="@+id/table"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:stretchColumns="*"/>
+    </ScrollView>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
