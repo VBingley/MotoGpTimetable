@@ -109,11 +109,10 @@ public class Rider {
 	}
 
 	public String toString(int previousPosition) {
-		
-		return String.join("\t", getPositionString(previousPosition), Integer.toString(number), getLaptime(), getLastTime(), getLeadGap(), getPreviousGap(), name.charAt(0) + " " + surname);
+		return String.join(" \t", getPositionString(previousPosition), Integer.toString(number), getLaptime(), getLastTime(), getLeadGap(), getPreviousGap(), name.charAt(0) + " " + surname);
 	}
 	
-	private String getPositionString(int previousPosition) {
+	public String getPositionString(int previousPosition) {
 		if(positionString != null) {
 			return positionString;
 		}

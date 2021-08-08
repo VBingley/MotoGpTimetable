@@ -13,11 +13,13 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.ui.AppBarConfiguration;
 import nl.bingley.motogptimetable.databinding.ActivityMainBinding;
+import nl.bingley.motogptimetable.model.Category;
 import nl.bingley.motogptimetable.model.Rider;
 import nl.bingley.motogptimetable.model.TimingSheet;
 
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TableRow;
 import android.widget.TextView;
 
@@ -71,35 +73,65 @@ public class MainActivity extends AppCompatActivity {
 
 		StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
 				this::parseResponse,
-				error -> showError("That didn't work!"));
+				error -> addTextRowToTable(new String[]{"Something went wrong!"}));
 
-		queue.add(stringRequest);
+		Thread thread = new Thread(() -> {
+			while (!Thread.interrupted()) {
+				queue.add(stringRequest);
+				try {
+					Thread.sleep(1000L);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		});
+		thread.start();
 	}
 
 	private void parseResponse(String response) {
+		binding.table.removeAllViews();
 		ObjectMapper mapper = new ObjectMapper();
+		addTextRowToTable(new String[]{"POS","NUM","NAME","TIME","LAST TIME","LEAD","GAP"});
 		try {
 			TimingSheet timingSheet = mapper.readValue(response, TimingSheet.class);
-			binding.toolbar.setTitle(timingSheet.lapTimes.getCategory().getName());
+			Category category = timingSheet.lapTimes.getCategory();
+			binding.toolbar.setTitle(category.getName() + " | " + category.getRemaining() + " remaining");
 			timingSheet.lapTimes.getRiders()
-					.forEach((pos, rider) -> binding.table.addView(createRow(rider)));
+					.forEach((pos, rider) -> addRowToTable(rider));
 		} catch (JsonProcessingException e) {
-			showError(e.getMessage());
+			addTextRowToTable(new String[]{e.getMessage()});
 		}
 	}
 
-	private void showError(String message) {
+	private void addTextRowToTable(String[] messages) {
 		TableRow row = new TableRow(binding.table.getContext());
-		TextView text = new TextView(row.getContext());
-		text.setText(message);
-		row.addView(text);
+		for (String message : messages) {
+			TextView text = new TextView(row.getContext());
+			text.setText(message);
+			text.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+			row.addView(text);
+		}
+		binding.table.addView(row);
 	}
 
-	private TableRow createRow(Rider rider) {
+	private void addRowToTable(Rider rider) {
 		TableRow row = new TableRow(binding.table.getContext());
+
+		addTextView(row, rider.getPositionString(rider.getPosition()));
+		addTextView(row, String.valueOf(rider.getNumber()));
+		addTextView(row, rider.getName().charAt(0) + " " + rider.getSurname().substring(0,3));
+		addTextView(row, rider.getLaptime());
+		addTextView(row, rider.getLastTime());
+		addTextView(row, rider.getLeadGap());
+		addTextView(row, rider.getPreviousGap());
+
+		binding.table.addView(row);
+	}
+
+	private void addTextView(TableRow row, String message) {
 		TextView text = new TextView(row.getContext());
-		text.setText(rider.toString(rider.getPosition()));
+		text.setText(message);
+		text.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_END);
 		row.addView(text);
-		return row;
 	}
 }
