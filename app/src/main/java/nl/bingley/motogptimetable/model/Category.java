@@ -8,6 +8,9 @@ public class Category {
 
 	@JsonProperty("category")
 	private String name;
+
+	@JsonProperty("session_name")
+	private String sessionName;
 	@JsonProperty("duration")
 	private int duration;
 	@JsonProperty("remaining")
@@ -19,6 +22,14 @@ public class Category {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public String getSessionName() {
+		return sessionName;
+	}
+
+	public void setSessionName(String sessionName) {
+		this.sessionName = sessionName;
 	}
 
 	public int getDuration() {
