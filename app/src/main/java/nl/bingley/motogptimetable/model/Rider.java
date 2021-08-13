@@ -69,9 +69,6 @@ public class Rider {
 	}
 	
 	public String getLaptime() {
-		if(laptime == null || laptime.isEmpty()) {
-			return "-:--.---";
-		}
 		return laptime;
 	}
 
@@ -80,9 +77,6 @@ public class Rider {
 	}
 	
 	public String getLastTime() {
-		if(lastTime == null || lastTime.isEmpty()) {
-			return "-:--.---";
-		}
 		return lastTime;
 	}
 	

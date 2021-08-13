@@ -25,9 +25,12 @@ import nl.bingley.motogptimetable.model.TimingSheet;
 public class TableUpdater extends Thread {
 	private static final String url = "https://www.motogp.com/en/json/live_timing/1";
 
+	private final TableRowUpdater tableRowUpdater;
+
 	private final RequestQueue queue;
 	private final TableLayout table;
 	private final Toolbar toolbar;
+	private final DurationConverter durationConverter;
 
 	private Collection<Rider> riders = new ArrayList<>();
 
@@ -35,13 +38,15 @@ public class TableUpdater extends Thread {
 		this.toolbar = toolbar;
 		this.table = table;
 		this.queue = queue;
+		tableRowUpdater = new TableRowUpdater(table);
+		durationConverter = new DurationConverter(0);
 	}
 
 	@Override
 	public void run() {
 		StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
 				this::handleResponse,
-				error -> addTextRowToTable(new String[]{"Error"}));
+				error -> tableRowUpdater.addTextRowToTable(new String[]{"Error requesting data"}));
 
 		Thread thread = new Thread(() -> {
 			while (!Thread.interrupted()) {
@@ -60,118 +65,47 @@ public class TableUpdater extends Thread {
 		table.removeAllViews();
 		try {
 			TimingSheet timingSheet = new ObjectMapper().readValue(response, TimingSheet.class);
-
-			//Set view title
 			Category category = timingSheet.lapTimes.getCategory();
-			toolbar.setTitle(category.getName() + " | " + category.getRemaining() + " remaining");
 
-			//Fill table
+			setViewTitle(category);
+
 			addHeaderToTable(category);
 			riders = TimingSheetUtils.fillNewRiderList(riders, timingSheet.lapTimes.getRiders().values());
-			riders.forEach(rider -> addRiderToTable(category, rider));
+			riders.forEach(rider -> tableRowUpdater.addRiderToTable(category, rider));
 		} catch (JsonProcessingException e) {
-			addTextRowToTable(new String[]{"Error"});
+			tableRowUpdater.addTextRowToTable(new String[]{"Error handling response"});
 		}
 	}
 
-	private void addTextRowToTable(String[] messages) {
-		TableRow row = new TableRow(table.getContext());
-		for (String message : messages) {
-			TextView text = new TextView(row.getContext());
-			text.setText(message);
-			text.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-			row.addView(text);
-		}
-		table.addView(row);
-	}
-
-	private void addRiderToTable(Category category, Rider rider) {
-		if (category.getSessionName().toLowerCase().contains("practice") || category.getSessionName().toLowerCase().contains("qualifying")) {
-			addQualifyingRowToTable(rider);
-		} else if (category.getSessionName().toLowerCase().contains("race")) {
-			addRaceRowToTable(rider);
+	private void setViewTitle(Category category) {
+		String title = category.getName();
+		if (TimingSheetUtils.isSessionStarted(category)) {
+			title += " | " + getSessionRemainingString(category);
+		} else if (category.getRemaining().equals("0")) {
+			title += " | " + "Finished";
 		} else {
-			addDefaultRowToTable(rider);
+			title += " | Not started";
 		}
+		toolbar.setTitle(title);
+	}
+
+	private String getSessionRemainingString(Category category) {
+		if (TimingSheetUtils.isSessionPracticeOrQualifying(category)) {
+			int remaining = Integer.parseInt(category.getRemaining());
+			return durationConverter.getDurationString(remaining) + " remaining";
+		} else if (TimingSheetUtils.isSessionRace(category)) {
+			return  category.getRemaining() + " laps remaining";
+		}
+		return "";
 	}
 
 	private void addHeaderToTable(Category category) {
-		if (category.getSessionName().toLowerCase().contains("practice") || category.getSessionName().toLowerCase().contains("qualifying")) {
-			addTextRowToTable(new String[]{"POS","NUM","NAME","BEST-LAP","LEAD-GAP","LAST-LAP"});
-		} else if (category.getSessionName().toLowerCase().contains("race")) {
-			addTextRowToTable(new String[]{"POS","NUM","NAME","LAST-LAP","LEAD-GAP","GAP"});
+		if (TimingSheetUtils.isSessionPracticeOrQualifying(category)) {
+			tableRowUpdater.addTextRowToTable(new String[]{"POS","NUM","NAME","BEST-LAP","LEAD-GAP","LAST-LAP"});
+		} else if (TimingSheetUtils.isSessionRace(category)) {
+			tableRowUpdater.addTextRowToTable(new String[]{"POS","NUM","NAME","LAST-LAP","LEAD-GAP","GAP"});
 		} else {
-			addTextRowToTable(new String[]{"POS","NUM","NAME","TIME","LAST-LAP","LEAD","GAP"});
-		}
-	}
-
-	private void addQualifyingRowToTable(Rider rider) {
-		TableRow row = new TableRow(table.getContext());
-		setRowBackgroundColor(row, rider);
-
-		TextView positionTextView = createRiderTextView(row.getContext(), TimingSheetUtils.getRiderPositionString(rider));
-		positionTextView.setTypeface(Typeface.MONOSPACE);
-		row.addView(positionTextView);
-		row.addView(createRiderTextView(row.getContext(), String.valueOf(rider.getNumber())));
-		TextView nameTextView = createRiderTextView(row.getContext(), rider.getName().charAt(0) + " " + rider.getSurname().substring(0, 3));
-		nameTextView.setTypeface(Typeface.MONOSPACE);
-		row.addView(nameTextView);
-		row.addView(createRiderTextView(row.getContext(), rider.getLaptime()));
-		row.addView(createRiderTextView(row.getContext(), rider.getLeadGap()));
-		row.addView(createRiderTextView(row.getContext(), rider.getLastTime()));
-
-		table.addView(row);
-	}
-
-	private void addRaceRowToTable(Rider rider) {
-		TableRow row = new TableRow(table.getContext());
-		setRowBackgroundColor(row, rider);
-
-		TextView positionTextView = createRiderTextView(row.getContext(), TimingSheetUtils.getRiderPositionString(rider));
-		positionTextView.setTypeface(Typeface.MONOSPACE);
-		row.addView(positionTextView);
-		row.addView(createRiderTextView(row.getContext(), String.valueOf(rider.getNumber())));
-		TextView nameTextView = createRiderTextView(row.getContext(), rider.getName().charAt(0) + " " + rider.getSurname().substring(0, 3));
-		nameTextView.setTypeface(Typeface.MONOSPACE);
-		row.addView(nameTextView);
-		row.addView(createRiderTextView(row.getContext(), rider.getLastTime()));
-		row.addView(createRiderTextView(row.getContext(), rider.getLeadGap()));
-		row.addView(createRiderTextView(row.getContext(), rider.getPreviousGap()));
-
-		table.addView(row);
-	}
-
-	private void addDefaultRowToTable(Rider rider) {
-		TableRow row = new TableRow(table.getContext());
-		setRowBackgroundColor(row, rider);
-
-		TextView positionTextView = createRiderTextView(row.getContext(), TimingSheetUtils.getRiderPositionString(rider));
-		positionTextView.setTypeface(Typeface.MONOSPACE);
-		row.addView(positionTextView);
-		row.addView(createRiderTextView(row.getContext(), String.valueOf(rider.getNumber())));
-		TextView nameTextView = createRiderTextView(row.getContext(), rider.getName().charAt(0) + " " + rider.getSurname().substring(0, 3));
-		nameTextView.setTypeface(Typeface.MONOSPACE);
-		row.addView(nameTextView);
-		row.addView(createRiderTextView(row.getContext(), rider.getLaptime()));
-		row.addView(createRiderTextView(row.getContext(), rider.getLastTime()));
-		row.addView(createRiderTextView(row.getContext(), rider.getLeadGap()));
-		row.addView(createRiderTextView(row.getContext(), rider.getPreviousGap()));
-
-		table.addView(row);
-	}
-
-	private TextView createRiderTextView(Context context, String message) {
-		TextView text = new TextView(context);
-		text.setText(message);
-		text.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_END);
-		return text;
-	}
-
-	private void setRowBackgroundColor(TableRow row, Rider rider) {
-		if (TimingSheetUtils.hasGainedPosition(rider)) {
-			row.setBackgroundColor(Color.argb(51,0,255,0));
-		} else if (TimingSheetUtils.hasLostPosition(rider)) {
-			row.setBackgroundColor(Color.argb(51,255,0,0));
+			tableRowUpdater.addTextRowToTable(new String[]{"POS","NUM","NAME","TIME","LAST-LAP","LEAD","GAP"});
 		}
 	}
 }
