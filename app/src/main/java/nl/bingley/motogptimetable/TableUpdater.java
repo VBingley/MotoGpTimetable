@@ -101,11 +101,11 @@ public class TableUpdater extends Thread {
 
 	private void addHeaderToTable(Category category) {
 		if (TimingSheetUtils.isSessionPracticeOrQualifying(category)) {
-			tableRowUpdater.addTextRowToTable(new String[]{"POS","NUM","NAME","BEST-LAP","LEAD-GAP","LAST-LAP"});
+			tableRowUpdater.addTextRowToTable(new String[]{"Pos","Num","Name","Best-lap","Lead-gap","Last-lap"});
 		} else if (TimingSheetUtils.isSessionRace(category)) {
-			tableRowUpdater.addTextRowToTable(new String[]{"POS","NUM","NAME","LAST-LAP","LEAD-GAP","GAP"});
+			tableRowUpdater.addTextRowToTable(new String[]{"Pos","Num","Name","Last-lap","Lead-gap","Gap"});
 		} else {
-			tableRowUpdater.addTextRowToTable(new String[]{"POS","NUM","NAME","TIME","LAST-LAP","LEAD","GAP"});
+			tableRowUpdater.addTextRowToTable(new String[]{"Pos","Num","Name","Time","Last-lap","Lead","Gap"});
 		}
 	}
 }

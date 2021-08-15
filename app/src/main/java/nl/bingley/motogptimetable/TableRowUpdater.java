@@ -8,6 +8,8 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+import org.apache.commons.text.WordUtils;
+
 import nl.bingley.motogptimetable.model.Category;
 import nl.bingley.motogptimetable.model.Rider;
 
@@ -32,7 +34,7 @@ public class TableRowUpdater {
 
 	public void addRiderToTable(Category category, Rider rider) {
 		if (TimingSheetUtils.isSessionPracticeOrQualifying(category)) {
-			addQualifyingRowToTable(rider);
+			addPracticeOrQualifyingRowToTable(rider);
 		} else if (TimingSheetUtils.isSessionRace(category)) {
 			addRaceRowToTable(rider);
 		} else {
@@ -40,7 +42,7 @@ public class TableRowUpdater {
 		}
 	}
 
-	private void addQualifyingRowToTable(Rider rider) {
+	private void addPracticeOrQualifyingRowToTable(Rider rider) {
 		TableRow row = new TableRow(table.getContext());
 		setRowBackgroundColor(row, rider);
 
@@ -48,7 +50,8 @@ public class TableRowUpdater {
 		positionTextView.setTypeface(Typeface.MONOSPACE);
 		row.addView(positionTextView);
 		row.addView(createRiderTextView(row.getContext(), String.valueOf(rider.getNumber())));
-		TextView nameTextView = createRiderTextView(row.getContext(), rider.getName().charAt(0) + " " + rider.getSurname());
+		TextView nameTextView = createRiderTextView(row.getContext(),
+				rider.getName().charAt(0) + " " + WordUtils.capitalizeFully(rider.getSurname()));
 		row.addView(nameTextView);
 		row.addView(createRiderTextView(row.getContext(), rider.getLaptime()));
 		row.addView(createRiderTextView(row.getContext(), rider.getLeadGap()));
@@ -65,7 +68,8 @@ public class TableRowUpdater {
 		positionTextView.setTypeface(Typeface.MONOSPACE);
 		row.addView(positionTextView);
 		row.addView(createRiderTextView(row.getContext(), String.valueOf(rider.getNumber())));
-		TextView nameTextView = createRiderTextView(row.getContext(), rider.getName().charAt(0) + " " + rider.getSurname());
+		TextView nameTextView = createRiderTextView(row.getContext(),
+				rider.getName().charAt(0) + " " + WordUtils.capitalizeFully(rider.getSurname()));
 		row.addView(nameTextView);
 		row.addView(createRiderTextView(row.getContext(), rider.getLastTime()));
 		row.addView(createRiderTextView(row.getContext(), rider.getLeadGap()));
