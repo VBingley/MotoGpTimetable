@@ -56,15 +56,6 @@ public class TimingSheetUtils {
 		return rider.getLastPosition() < rider.getPosition() && rider.getLastPosition() != -1;
 	}
 
-	public static boolean isSessionPracticeOrQualifying(Category category) {
-		return category.getSessionName().toLowerCase().contains("practice") ||
-				category.getSessionName().toLowerCase().contains("qualifying");
-	}
-
-	public static boolean isSessionRace(Category category) {
-		return category.getSessionName().toLowerCase().contains("race");
-	}
-
 	public static boolean isSessionStarted(Category category) {
 		return "S".equals(category.getSessionStatus());
 	}

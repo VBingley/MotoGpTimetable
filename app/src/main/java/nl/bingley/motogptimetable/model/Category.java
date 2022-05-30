@@ -58,6 +58,18 @@ public class Category {
 		this.remaining = remaining;
 	}
 
+	public SessionType getType() {
+		if (sessionName.toLowerCase().contains("practice")) {
+			return SessionType.Practice;
+		} else if (sessionName.toLowerCase().contains("qualifying")) {
+			return SessionType.Qualifying;
+		} else if (sessionName.toLowerCase().contains("race")) {
+			return SessionType.Race;
+		} else {
+			return SessionType.Unknown;
+		}
+	}
+
 	@Override
 	public String toString() {
 		return name + "\tTotal: " + duration + "\tRemaining:" + remaining;

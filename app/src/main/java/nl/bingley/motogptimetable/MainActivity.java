@@ -13,8 +13,9 @@ import nl.bingley.motogptimetable.databinding.ActivityMainBinding;
 
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
 	private AppBarConfiguration appBarConfiguration;
 	private ActivityMainBinding binding;
@@ -64,5 +65,10 @@ public class MainActivity extends AppCompatActivity {
 		RequestQueue queue = Volley.newRequestQueue(this);
 		new TableUpdater(binding.toolbar, binding.table, queue)
 				.start();
+	}
+
+	@Override
+	public void onClick(View view) {
+
 	}
 }

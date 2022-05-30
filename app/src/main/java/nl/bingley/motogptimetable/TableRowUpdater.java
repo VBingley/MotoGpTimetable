@@ -12,6 +12,7 @@ import org.apache.commons.text.WordUtils;
 
 import nl.bingley.motogptimetable.model.Category;
 import nl.bingley.motogptimetable.model.Rider;
+import nl.bingley.motogptimetable.model.SessionType;
 
 public class TableRowUpdater {
 
@@ -30,16 +31,6 @@ public class TableRowUpdater {
 			row.addView(text);
 		}
 		table.addView(row);
-	}
-
-	public void addRiderToTable(Category category, Rider rider) {
-		if (TimingSheetUtils.isSessionPracticeOrQualifying(category)) {
-			addPracticeOrQualifyingRowToTable(rider);
-		} else if (TimingSheetUtils.isSessionRace(category)) {
-			addRaceRowToTable(rider);
-		} else {
-			addDefaultRowToTable(rider);
-		}
 	}
 
 	private void addPracticeOrQualifyingRowToTable(Rider rider) {
@@ -78,21 +69,24 @@ public class TableRowUpdater {
 		table.addView(row);
 	}
 
-	private void addDefaultRowToTable(Rider rider) {
+	public void addDefaultRowToTable(Rider rider) {
 		TableRow row = new TableRow(table.getContext());
 		setRowBackgroundColor(row, rider);
 
+		// POS
 		TextView positionTextView = createRiderTextView(row.getContext(), TimingSheetUtils.getRiderPositionString(rider));
 		positionTextView.setTypeface(Typeface.MONOSPACE);
 		row.addView(positionTextView);
+		// NUM
 		row.addView(createRiderTextView(row.getContext(), String.valueOf(rider.getNumber())));
+		// NAME
 		TextView nameTextView = createRiderTextView(row.getContext(), rider.getName().charAt(0) + " " + rider.getSurname().substring(0, 3));
 		nameTextView.setTypeface(Typeface.MONOSPACE);
 		row.addView(nameTextView);
+		// LAPTIME
 		row.addView(createRiderTextView(row.getContext(), rider.getLaptime()));
-		row.addView(createRiderTextView(row.getContext(), rider.getLastTime()));
+		// GAP
 		row.addView(createRiderTextView(row.getContext(), rider.getLeadGap()));
-		row.addView(createRiderTextView(row.getContext(), rider.getPreviousGap()));
 
 		table.addView(row);
 	}

@@ -1,12 +1,6 @@
 package nl.bingley.motogptimetable;
 
-import android.content.Context;
-import android.graphics.Color;
-import android.graphics.Typeface;
-import android.view.View;
 import android.widget.TableLayout;
-import android.widget.TableRow;
-import android.widget.TextView;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -20,6 +14,7 @@ import java.util.Collection;
 import androidx.appcompat.widget.Toolbar;
 import nl.bingley.motogptimetable.model.Category;
 import nl.bingley.motogptimetable.model.Rider;
+import nl.bingley.motogptimetable.model.SessionType;
 import nl.bingley.motogptimetable.model.TimingSheet;
 
 public class TableUpdater extends Thread {
@@ -65,16 +60,20 @@ public class TableUpdater extends Thread {
 		table.removeAllViews();
 		try {
 			TimingSheet timingSheet = new ObjectMapper().readValue(response, TimingSheet.class);
-			Category category = timingSheet.lapTimes.getCategory();
+			updateTable(timingSheet);
 
-			setViewTitle(category);
-
-			addHeaderToTable(category);
-			riders = TimingSheetUtils.fillNewRiderList(riders, timingSheet.lapTimes.getRiders().values());
-			riders.forEach(rider -> tableRowUpdater.addRiderToTable(category, rider));
 		} catch (JsonProcessingException e) {
 			tableRowUpdater.addTextRowToTable(new String[]{"Error handling response"});
 		}
+	}
+
+	private void updateTable(TimingSheet timingSheet) {
+		Category category = timingSheet.lapTimes.getCategory();
+		setViewTitle(category);
+
+		addHeaderToTable();
+		riders = TimingSheetUtils.fillNewRiderList(riders, timingSheet.lapTimes.getRiders().values());
+		riders.forEach(tableRowUpdater::addDefaultRowToTable);
 	}
 
 	private void setViewTitle(Category category) {
@@ -90,22 +89,16 @@ public class TableUpdater extends Thread {
 	}
 
 	private String getSessionRemainingString(Category category) {
-		if (TimingSheetUtils.isSessionPracticeOrQualifying(category)) {
+		if (category.getType() == SessionType.Practice || category.getType() == SessionType.Qualifying) {
 			int remaining = Integer.parseInt(category.getRemaining());
 			return durationConverter.getDurationString(remaining) + " remaining";
-		} else if (TimingSheetUtils.isSessionRace(category)) {
-			return  category.getRemaining() + " laps remaining";
+		} else if (category.getType() == SessionType.Race) {
+			return  category.getRemaining() + " laps remaining of " + category.getDuration();
 		}
 		return "";
 	}
 
-	private void addHeaderToTable(Category category) {
-		if (TimingSheetUtils.isSessionPracticeOrQualifying(category)) {
-			tableRowUpdater.addTextRowToTable(new String[]{"Pos","Num","Name","Best-lap","Lead-gap","Last-lap"});
-		} else if (TimingSheetUtils.isSessionRace(category)) {
-			tableRowUpdater.addTextRowToTable(new String[]{"Pos","Num","Name","Last-lap","Lead-gap","Gap"});
-		} else {
-			tableRowUpdater.addTextRowToTable(new String[]{"Pos","Num","Name","Time","Last-lap","Lead","Gap"});
-		}
+	private void addHeaderToTable() {
+		tableRowUpdater.addTextRowToTable(new String[]{"Pos","Num","Name","Lap-Time","Gap"});
 	}
 }
