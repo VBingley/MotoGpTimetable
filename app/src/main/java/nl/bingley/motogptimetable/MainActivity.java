@@ -9,66 +9,63 @@ import com.google.android.material.snackbar.Snackbar;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.ui.AppBarConfiguration;
+
 import nl.bingley.motogptimetable.databinding.ActivityMainBinding;
 
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity {
 
-	private AppBarConfiguration appBarConfiguration;
-	private ActivityMainBinding binding;
+    private AppBarConfiguration appBarConfiguration;
+    private ActivityMainBinding binding;
 
-	public MainActivity() {
-		super();
-	}
+    public MainActivity() {
+        super();
+    }
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
-		binding = ActivityMainBinding.inflate(getLayoutInflater());
-		setContentView(binding.getRoot());
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
-		setSupportActionBar(binding.toolbar);
-	}
+        setSupportActionBar(binding.toolbar);
+    }
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.menu_main, menu);
-		return true;
-	}
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
 
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle action bar item clicks here. The action bar will
-		// automatically handle clicks on the Home/Up button, so long
-		// as you specify a parent activity in AndroidManifest.xml.
-		int id = item.getItemId();
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
 
-		//noinspection SimplifiableIfStatement
-		if (id == R.id.action_settings) {
-			Snackbar.make(binding.toolbar, "There are no settings, maybe later.", Snackbar.LENGTH_LONG)
-					.setAction("Action", null).show();
-			return true;
-		}
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            Snackbar.make(binding.toolbar, "There are no settings, maybe later.", Snackbar.LENGTH_LONG)
+                    .setAction("Action", null).show();
+            return true;
+        }
 
-		return super.onOptionsItemSelected(item);
-	}
+        return super.onOptionsItemSelected(item);
+    }
 
-	@Override
-	protected void onPostCreate(@Nullable Bundle savedInstanceState) {
-		super.onPostCreate(savedInstanceState);
+    @Override
+    protected void onPostCreate(@Nullable Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
 
-		RequestQueue queue = Volley.newRequestQueue(this);
-		new TableUpdater(binding.toolbar, binding.table, queue)
-				.start();
-	}
-
-	@Override
-	public void onClick(View view) {
-
-	}
+        TableData tableData = new TableData();
+        TableUpdater tableUpdater = new TableUpdater(binding.toolbar, binding.table, tableData);
+        RequestQueue queue = Volley.newRequestQueue(this);
+        new DataUpdater(queue, tableUpdater, tableData)
+                .start();
+    }
 }
