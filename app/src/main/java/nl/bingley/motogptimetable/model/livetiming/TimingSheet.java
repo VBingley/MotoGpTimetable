@@ -11,8 +11,4 @@ public class TimingSheet {
 	public LapTimes getLapTimes() {
 		return lapTimes;
 	}
-
-	public void setLapTimes(LapTimes lapTimes) {
-		this.lapTimes = lapTimes;
-	}
 }

@@ -29,8 +29,6 @@ public class Rider {
 
 	private int lastPosition;
 	private LocalDateTime lastPositionChange;
-	private String color;
-	private String textColor;
 
 	public Rider() {
 		lastPosition = -1;
@@ -40,61 +38,29 @@ public class Rider {
 	public int getId() {
 		return id;
 	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
-
-	public void setNumber(int number) {
-		this.number = number;
-	}
 	
 	public int getNumber() {
 		return number;
-	}
-	
-	public void setName(String name) {
-		this.name = name;
 	}
 	
 	public String getName() {
 		return name;
 	}
 	
-	public void setSurname(String surname) {
-		this.surname = surname;
-	}
-	
 	public String getSurname() {
 		return surname;
-	}
-	
-	public void setPosition(int position) {
-		this.position = position;
 	}
 	
 	public int getPosition() {
 		return position;
 	}
 	
-	public void setLapTime(String lapTime) {
-		this.lapTime = lapTime;
-	}
-	
 	public String getLapTime() {
 		return lapTime;
-	}
-
-	public void setLastTime(String lastTime) {
-		this.lastTime = lastTime;
 	}
 	
 	public String getLastTime() {
 		return lastTime;
-	}
-	
-	public void setLeadGap(String leadGap) {
-		this.leadGap = leadGap;
 	}
 	
 	public String getLeadGap() {
@@ -102,10 +68,6 @@ public class Rider {
 			return leadGap.substring(0,7);
 		}
 		return leadGap;
-	}
-
-	public void setPreviousGap(String previousGap) {
-		this.previousGap = previousGap;
 	}
 	
 	public String getPreviousGap() {
@@ -129,21 +91,5 @@ public class Rider {
 
 	public void setLastPositionChange(LocalDateTime lastPositionChange) {
 		this.lastPositionChange = lastPositionChange;
-	}
-
-	public String getColor() {
-		return color;
-	}
-
-	public void setColor(String color) {
-		this.color = color;
-	}
-
-	public String getTextColor() {
-		return textColor;
-	}
-
-	public void setTextColor(String textColor) {
-		this.textColor = textColor;
 	}
 }

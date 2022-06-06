@@ -27,16 +27,8 @@ public class Category {
 		return id;
 	}
 
-	public void setId(int id) {
-		this.id = id;
-	}
-
 	public String getName() {
 		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
 	}
 
 	public String getYear() {
@@ -44,40 +36,20 @@ public class Category {
 		return split[split.length-1];
 	}
 
-	public void setYear(String year) {
-		this.year = year;
-	}
-
 	public String getSessionStatus() {
 		return sessionStatus;
-	}
-
-	public void setSessionStatus(String sessionStatus) {
-		this.sessionStatus = sessionStatus;
 	}
 
 	public String getSessionName() {
 		return sessionName;
 	}
 
-	public void setSessionName(String sessionName) {
-		this.sessionName = sessionName;
-	}
-
 	public String getDuration() {
 		return duration;
 	}
 
-	public void setDuration(String duration) {
-		this.duration = duration;
-	}
-
 	public String getRemaining() {
 		return remaining;
-	}
-
-	public void setRemaining(String remaining) {
-		this.remaining = remaining;
 	}
 
 	public SessionType getType() {

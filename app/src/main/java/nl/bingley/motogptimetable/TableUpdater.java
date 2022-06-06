@@ -12,9 +12,11 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import androidx.appcompat.widget.Toolbar;
 
+import nl.bingley.motogptimetable.model.RiderDetails;
 import nl.bingley.motogptimetable.model.livetiming.Category;
 import nl.bingley.motogptimetable.model.livetiming.ColumnType;
 import nl.bingley.motogptimetable.model.livetiming.Rider;
@@ -90,6 +92,9 @@ public class TableUpdater {
     }
 
     public void addRowToTable(Rider rider) {
+        Optional<RiderDetails> riderDetails = tableData.getRiderDetailsList().stream()
+                .filter(riderD -> riderD.getId() == rider.getId())
+                .findFirst();
         TableRow row = new TableRow(table.getContext());
         setRowBackgroundColor(row, rider);
 
@@ -97,39 +102,47 @@ public class TableUpdater {
         TextView positionTextView = createRiderTextView(row.getContext(), TimingSheetUtils.getRiderPositionString(rider), ColumnType.Position);
         positionTextView.setTypeface(Typeface.MONOSPACE);
         row.addView(positionTextView);
+
         // NUM
         TextView numTextView = createRiderTextView(row.getContext(), String.valueOf(rider.getNumber()), ColumnType.Number);
         numTextView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-        tableData.getRiderDetailsList().stream()
-                .filter(riderDetails -> riderDetails.getId() == rider.getId())
-                .findFirst()
-                .ifPresent(riderDetails -> {
-                    numTextView.setBackgroundColor(Color.parseColor(riderDetails.getColor()));
-                    numTextView.setTextColor(Color.parseColor(riderDetails.getTextColor()));
-                });
+        riderDetails.ifPresent(riderD -> {
+            numTextView.setBackgroundColor(Color.parseColor(riderD.getColor()));
+            numTextView.setTextColor(Color.parseColor(riderD.getTextColor()));
+        });
         TableRow.LayoutParams params = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
-        params.setMargins(2,2,2,2);
+        params.setMargins(2, 2, 2, 2);
         row.addView(numTextView, params);
+
         // NAME
         String name;
         if (tableData.isColumnNameTypeLong()) {
-            name = rider.getName().charAt(0) + " " + rider.getSurname().charAt(0) + rider.getSurname().substring(1).toLowerCase();
+            name = rider.getName().charAt(0) + ". " + rider.getSurname().charAt(0) + rider.getSurname().substring(1).toLowerCase();
+            if (riderDetails.isPresent()) {
+                name = riderDetails.get().getName().charAt(0) + ". " + riderDetails.get().getSurname();
+            }
         } else {
-            name = rider.getName().charAt(0) + " " + rider.getSurname().substring(0, 3);
+            name = rider.getName().charAt(0) + " " + rider.getSurname().replace(" ", "").substring(0, 3);
         }
         TextView nameTextView = createRiderTextView(row.getContext(), name, tableData.getColumnName());
         row.addView(nameTextView);
+
         // LAPTIME
         String lapTime;
-        if (tableData.isColumnLapTimeTypeBest()) {
+        if (rider.getPosition() == -1) {
+            lapTime = "";
+        } else if (tableData.isColumnLapTimeTypeBest()) {
             lapTime = rider.getLapTime();
         } else {
             lapTime = rider.getLastTime();
         }
         row.addView(createRiderTextView(row.getContext(), lapTime, tableData.getColumnLapTime()));
+
         // GAP
         String gap;
-        if (tableData.isColumnGapTypeLead()) {
+        if (rider.getPosition() == -1) {
+            gap = "";
+        } else if (tableData.isColumnGapTypeLead()) {
             gap = rider.getLeadGap();
         } else {
             gap = rider.getPreviousGap();

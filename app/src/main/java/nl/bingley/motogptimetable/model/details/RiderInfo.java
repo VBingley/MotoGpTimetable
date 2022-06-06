@@ -19,31 +19,15 @@ public class RiderInfo {
         return legacyId;
     }
 
-    public void setLegacyId(int legacyId) {
-        this.legacyId = legacyId;
-    }
-
     public String getName() {
         return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public String getSurname() {
         return surname;
     }
 
-    public void setSurname(String surname) {
-        this.surname = surname;
-    }
-
     public RiderCareer getCareer() {
         return career;
-    }
-
-    public void setCareer(RiderCareer career) {
-        this.career = career;
     }
 }

@@ -19,23 +19,11 @@ public class Season {
         return id;
     }
 
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public int getLegacyId() {
         return legacyId;
-    }
-
-    public void setLegacyId(int legacyId) {
-        this.legacyId = legacyId;
     }
 }

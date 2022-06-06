@@ -23,8 +23,8 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginTop="?attr/actionBarSize"
         android:scrollbars="none"
-        android:translationY="?attr/actionBarSize"
         android:layout_weight="1">
         <TableLayout
             android:id="@+id/table"

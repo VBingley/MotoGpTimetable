@@ -124,11 +124,7 @@ public class DataUpdater extends Thread {
             List<RiderInfo> riderInfoList = new ObjectMapper().readValue(response, new TypeReference<List<RiderInfo>>() {
             });
             tableData.setRiderDetailsList(riderInfoList.stream()
-                    .map(riderInfo -> new RiderDetails(
-                            riderInfo.getLegacyId(),
-                            riderInfo.getCareer().getTeam().getName(),
-                            riderInfo.getCareer().getTeam().getColor(),
-                            riderInfo.getCareer().getTeam().getTextColor()))
+                    .map(RiderDetails::new)
                     .collect(Collectors.toList()));
             tableUpdater.refreshTable();
         } catch (JsonProcessingException e) {

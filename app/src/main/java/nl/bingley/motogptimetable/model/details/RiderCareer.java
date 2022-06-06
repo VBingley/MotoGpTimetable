@@ -15,15 +15,7 @@ public class RiderCareer {
         return riderNumber;
     }
 
-    public void setRiderNumber(int riderNumber) {
-        this.riderNumber = riderNumber;
-    }
-
     public Team getTeam() {
         return team;
-    }
-
-    public void setTeam(Team team) {
-        this.team = team;
     }
 }

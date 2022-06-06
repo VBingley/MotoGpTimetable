@@ -17,15 +17,7 @@ public class LapTimes {
 		return category;
 	}
 
-	public void setCategory(Category category) {
-		this.category = category;
-	}
-
 	public Map<Integer, Rider> getRiders() {
 		return riders;
-	}
-
-	public void setRiders(Map<Integer, Rider> riders) {
-		this.riders = riders;
 	}
 }
