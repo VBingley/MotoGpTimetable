@@ -1,4 +1,4 @@
-package nl.bingley.motogptimetable.model;
+package nl.bingley.motogptimetable.model.livetiming;
 
 import java.util.Map;
 
@@ -27,10 +27,5 @@ public class LapTimes {
 
 	public void setRiders(Map<Integer, Rider> riders) {
 		this.riders = riders;
-	}
-
-	@Override
-	public String toString() {
-		return riders.values().stream().map(Rider::toString).reduce("", (rider1, rider2) -> rider1 + "\n" + rider2);
 	}
 }

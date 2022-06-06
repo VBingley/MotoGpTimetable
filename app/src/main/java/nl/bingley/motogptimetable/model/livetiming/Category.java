@@ -1,14 +1,19 @@
-package nl.bingley.motogptimetable.model;
+package nl.bingley.motogptimetable.model.livetiming;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Date;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Category {
 
+	@JsonProperty("championship_id")
+	private int id;
 	@JsonProperty("category")
 	private String name;
-
+	@JsonProperty("date")
+	private String year;
 	@JsonProperty("session_status_id")
 	private String sessionStatus;
 	@JsonProperty("session_name")
@@ -18,12 +23,29 @@ public class Category {
 	@JsonProperty("remaining")
 	private String remaining;
 
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
 	public String getName() {
 		return name;
 	}
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public String getYear() {
+		String[] split = year.split("/");
+		return split[split.length-1];
+	}
+
+	public void setYear(String year) {
+		this.year = year;
 	}
 
 	public String getSessionStatus() {
@@ -68,10 +90,5 @@ public class Category {
 		} else {
 			return SessionType.Unknown;
 		}
-	}
-
-	@Override
-	public String toString() {
-		return name + "\tTotal: " + duration + "\tRemaining:" + remaining;
 	}
 }

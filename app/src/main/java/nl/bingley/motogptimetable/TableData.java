@@ -3,18 +3,28 @@ package nl.bingley.motogptimetable;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import nl.bingley.motogptimetable.model.Category;
-import nl.bingley.motogptimetable.model.ColumnType;
-import nl.bingley.motogptimetable.model.Rider;
+import nl.bingley.motogptimetable.model.RiderDetails;
+import nl.bingley.motogptimetable.model.livetiming.Category;
+import nl.bingley.motogptimetable.model.livetiming.ColumnType;
+import nl.bingley.motogptimetable.model.livetiming.Rider;
 
 public class TableData {
 
-    private Collection<Rider> riders = new ArrayList<>();
     private Category category;
+    private Collection<Rider> riders = new ArrayList<>();
+    private Collection<RiderDetails> riderDetailsList = new ArrayList<>();
 
     private ColumnType columnName = ColumnType.ShortName;
     private ColumnType columnLapTime = ColumnType.BestLapTime;
     private ColumnType columnGap = ColumnType.LeadGap;
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
+    }
 
     public Collection<Rider> getRiders() {
         return riders;
@@ -24,12 +34,12 @@ public class TableData {
         this.riders = riders;
     }
 
-    public Category getCategory() {
-        return category;
+    public Collection<RiderDetails> getRiderDetailsList() {
+        return riderDetailsList;
     }
 
-    public void setCategory(Category category) {
-        this.category = category;
+    public void setRiderDetailsList(Collection<RiderDetails> riderDetailsList) {
+        this.riderDetailsList = riderDetailsList;
     }
 
     public ColumnType getColumnName() {

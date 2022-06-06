@@ -1,4 +1,4 @@
-package nl.bingley.motogptimetable.model;
+package nl.bingley.motogptimetable.model.livetiming;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -6,10 +6,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TimingSheet {
 	@JsonProperty("lt")
-	public LapTimes lapTimes;
-	
-	@Override
-	public String toString() {
-		return lapTimes.toString();
+	private LapTimes lapTimes;
+
+	public LapTimes getLapTimes() {
+		return lapTimes;
+	}
+
+	public void setLapTimes(LapTimes lapTimes) {
+		this.lapTimes = lapTimes;
 	}
 }

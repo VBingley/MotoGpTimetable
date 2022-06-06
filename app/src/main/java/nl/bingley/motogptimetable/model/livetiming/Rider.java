@@ -1,4 +1,4 @@
-package nl.bingley.motogptimetable.model;
+package nl.bingley.motogptimetable.model.livetiming;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -7,6 +7,9 @@ import java.time.LocalDateTime;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Rider {
+
+	@JsonProperty("rider_id")
+	private int id;
 	@JsonProperty("rider_number")
 	private int number;
 	@JsonProperty("rider_name")
@@ -16,7 +19,7 @@ public class Rider {
 	@JsonProperty("pos")
 	private int position;
 	@JsonProperty("lap_time")
-	private String laptime;
+	private String lapTime;
 	@JsonProperty("gap_first")
 	private String leadGap;
 	@JsonProperty("last_lap_time")
@@ -26,10 +29,20 @@ public class Rider {
 
 	private int lastPosition;
 	private LocalDateTime lastPositionChange;
+	private String color;
+	private String textColor;
 
 	public Rider() {
 		lastPosition = -1;
 		lastPositionChange = LocalDateTime.now();
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
 	}
 
 	public void setNumber(int number) {
@@ -64,12 +77,12 @@ public class Rider {
 		return position;
 	}
 	
-	public void setLaptime(String laptime) {
-		this.laptime = laptime;
+	public void setLapTime(String lapTime) {
+		this.lapTime = lapTime;
 	}
 	
-	public String getLaptime() {
-		return laptime;
+	public String getLapTime() {
+		return lapTime;
 	}
 
 	public void setLastTime(String lastTime) {
@@ -102,10 +115,6 @@ public class Rider {
 		return previousGap;
 	}
 
-	public String toString() {
-		return String.join(" \t", Integer.toString(position), Integer.toString(number), getLaptime(), getLastTime(), getLeadGap(), getPreviousGap(), name.charAt(0) + " " + surname);
-	}
-
 	public int getLastPosition() {
 		return lastPosition;
 	}
@@ -120,5 +129,21 @@ public class Rider {
 
 	public void setLastPositionChange(LocalDateTime lastPositionChange) {
 		this.lastPositionChange = lastPositionChange;
+	}
+
+	public String getColor() {
+		return color;
+	}
+
+	public void setColor(String color) {
+		this.color = color;
+	}
+
+	public String getTextColor() {
+		return textColor;
+	}
+
+	public void setTextColor(String textColor) {
+		this.textColor = textColor;
 	}
 }

@@ -3,8 +3,8 @@ package nl.bingley.motogptimetable;
 import java.time.LocalDateTime;
 import java.util.Collection;
 
-import nl.bingley.motogptimetable.model.Category;
-import nl.bingley.motogptimetable.model.Rider;
+import nl.bingley.motogptimetable.model.livetiming.Category;
+import nl.bingley.motogptimetable.model.livetiming.Rider;
 
 public class TimingSheetUtils {
 
@@ -33,19 +33,23 @@ public class TimingSheetUtils {
     public static String getRiderPositionString(Rider rider) {
         String position = String.valueOf(rider.getPosition());
         if (position.equals("-1")) {
-            return "-";
+            return "- ";
         }
 
         if (position.length() == 1) {
             position = " " + position;
         }
         if (hasLostPosition(rider)) {
-            return "v " + position;
+            return "v " + position + " ";
         } else if (hasGainedPosition(rider)) {
-            return "^ " + position;
+            return "^ " + position + " ";
         } else {
-            return "  " + position;
+            return "  " + position + " ";
         }
+    }
+
+    public static boolean hasRecentlyCrashed(Rider rider) {
+        return rider.getLastPosition() != -1 && rider.getPosition() == -1;
     }
 
     public static boolean hasGainedPosition(Rider rider) {

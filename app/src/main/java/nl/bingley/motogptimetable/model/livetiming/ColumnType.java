@@ -1,4 +1,4 @@
-package nl.bingley.motogptimetable.model;
+package nl.bingley.motogptimetable.model.livetiming;
 
 public enum ColumnType {
     Position,

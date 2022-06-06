@@ -15,9 +15,9 @@ import java.util.List;
 
 import androidx.appcompat.widget.Toolbar;
 
-import nl.bingley.motogptimetable.model.Category;
-import nl.bingley.motogptimetable.model.ColumnType;
-import nl.bingley.motogptimetable.model.Rider;
+import nl.bingley.motogptimetable.model.livetiming.Category;
+import nl.bingley.motogptimetable.model.livetiming.ColumnType;
+import nl.bingley.motogptimetable.model.livetiming.Rider;
 
 public class TableUpdater {
 
@@ -98,7 +98,18 @@ public class TableUpdater {
         positionTextView.setTypeface(Typeface.MONOSPACE);
         row.addView(positionTextView);
         // NUM
-        row.addView(createRiderTextView(row.getContext(), String.valueOf(rider.getNumber()), ColumnType.Number));
+        TextView numTextView = createRiderTextView(row.getContext(), String.valueOf(rider.getNumber()), ColumnType.Number);
+        numTextView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+        tableData.getRiderDetailsList().stream()
+                .filter(riderDetails -> riderDetails.getId() == rider.getId())
+                .findFirst()
+                .ifPresent(riderDetails -> {
+                    numTextView.setBackgroundColor(Color.parseColor(riderDetails.getColor()));
+                    numTextView.setTextColor(Color.parseColor(riderDetails.getTextColor()));
+                });
+        TableRow.LayoutParams params = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
+        params.setMargins(2,2,2,2);
+        row.addView(numTextView, params);
         // NAME
         String name;
         if (tableData.isColumnNameTypeLong()) {
@@ -111,7 +122,7 @@ public class TableUpdater {
         // LAPTIME
         String lapTime;
         if (tableData.isColumnLapTimeTypeBest()) {
-            lapTime = rider.getLaptime();
+            lapTime = rider.getLapTime();
         } else {
             lapTime = rider.getLastTime();
         }
@@ -165,7 +176,9 @@ public class TableUpdater {
     }
 
     private void setRowBackgroundColor(TableRow row, Rider rider) {
-        if (TimingSheetUtils.hasGainedPosition(rider)) {
+        if (TimingSheetUtils.hasRecentlyCrashed(rider)) {
+            row.setBackgroundColor(Color.argb(51, 255, 165, 0));
+        } else if (TimingSheetUtils.hasGainedPosition(rider)) {
             row.setBackgroundColor(Color.argb(51, 0, 255, 0));
         } else if (TimingSheetUtils.hasLostPosition(rider)) {
             row.setBackgroundColor(Color.argb(51, 255, 0, 0));
