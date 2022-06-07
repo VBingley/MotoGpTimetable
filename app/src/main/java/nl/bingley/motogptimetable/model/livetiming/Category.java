@@ -3,8 +3,6 @@ package nl.bingley.motogptimetable.model.livetiming;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.Date;
-
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Category {
 
@@ -62,5 +60,13 @@ public class Category {
 		} else {
 			return SessionType.Unknown;
 		}
+	}
+
+	public boolean isSessionStarted() {
+		return "S".equals(sessionStatus);
+	}
+
+	public boolean isSessionFinished() {
+		return remaining.equals("0");
 	}
 }

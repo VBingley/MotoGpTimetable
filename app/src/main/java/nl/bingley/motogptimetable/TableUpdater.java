@@ -9,18 +9,11 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 
 import nl.bingley.motogptimetable.model.RiderDetails;
 import nl.bingley.motogptimetable.model.livetiming.Category;
-import nl.bingley.motogptimetable.model.livetiming.ColumnType;
 import nl.bingley.motogptimetable.model.livetiming.Rider;
 
 public class TableUpdater {
@@ -48,9 +41,9 @@ public class TableUpdater {
 
     private void setViewTitle(Category category) {
         String title = category.getName();
-        if (TimingSheetUtils.isSessionStarted(category)) {
+        if (category.isSessionStarted()) {
             title += " | " + getSessionRemainingString(category);
-        } else if (category.getRemaining().equals("0")) {
+        } else if (category.isSessionFinished()) {
             title += " | " + "Finished";
         } else {
             title += " | " + getPreSessionString(category);
