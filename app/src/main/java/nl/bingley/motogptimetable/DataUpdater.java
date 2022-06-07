@@ -8,9 +8,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,11 +19,13 @@ import nl.bingley.motogptimetable.model.details.RiderInfo;
 import nl.bingley.motogptimetable.model.details.Season;
 import nl.bingley.motogptimetable.model.livetiming.Category;
 import nl.bingley.motogptimetable.model.livetiming.ColumnType;
+import nl.bingley.motogptimetable.model.livetiming.Rider;
 import nl.bingley.motogptimetable.model.livetiming.SessionType;
 import nl.bingley.motogptimetable.model.livetiming.TimingSheet;
 
 public class DataUpdater extends Thread {
 
+    private static final int positionTimeout = 15;
     private static final String liveTimingUrl = "https://www.motogp.com/en/json/live_timing/1";
     private static final String detailsBaseUrl = "https://api.motogp.com/riders-api/season/";
     private static final String seasonUrl = "/categories";
@@ -69,11 +71,11 @@ public class DataUpdater extends Thread {
                 tableData.setCategory(newCategory);
                 tableData.setRiders(new ArrayList<>());
                 tableData.setRiderDetailsList(new ArrayList<>());
-                tableData.setRiders(TimingSheetUtils.fillNewRiderList(tableData.getRiders(), timingSheet.getLapTimes().getRiders().values()));
+                tableData.setRiders(fillNewRiderList(tableData.getRiders(), timingSheet.getLapTimes().getRiders().values()));
                 fetchRiderDetails();
             } else {
                 tableData.setCategory(newCategory);
-                tableData.setRiders(TimingSheetUtils.fillNewRiderList(tableData.getRiders(), timingSheet.getLapTimes().getRiders().values()));
+                tableData.setRiders(fillNewRiderList(tableData.getRiders(), timingSheet.getLapTimes().getRiders().values()));
             }
             tableUpdater.refreshTable();
         } catch (JsonProcessingException e) {
@@ -130,5 +132,25 @@ public class DataUpdater extends Thread {
         } catch (JsonProcessingException e) {
             // Not that important
         }
+    }
+
+    public static Collection<Rider> fillNewRiderList(Collection<Rider> oldRiderList, Collection<Rider> newRiderList) {
+        newRiderList.forEach(newRider -> oldRiderList.stream()
+                .filter(oldRider -> oldRider.getNumber() == newRider.getNumber())
+                .findAny().ifPresent(oldRider -> {
+                    if (newRider.getPosition() != oldRider.getPosition()) {
+                        // Position changed before timeout
+                        newRider.setLastPosition(oldRider.getPosition());
+                    } else if (newRider.getPosition() == oldRider.getPosition() && oldRider.getLastPositionChange().isAfter(LocalDateTime.now().minusSeconds(positionTimeout))) {
+                        // Position change is recent, keep lastPosition
+                        newRider.setLastPosition(oldRider.getLastPosition());
+                        newRider.setLastPositionChange(oldRider.getLastPositionChange());
+                    } else {
+                        // Position hasn't changed
+                        newRider.setLastPosition(newRider.getPosition());
+                        newRider.setLastPositionChange(oldRider.getLastPositionChange());
+                    }
+                }));
+        return newRiderList;
     }
 }

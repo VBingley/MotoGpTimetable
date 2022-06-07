@@ -8,6 +8,8 @@ public class Team {
 
     @JsonProperty("name")
     private String name;
+    @JsonProperty("constructor")
+    private Constructor constructor;
     @JsonProperty("color")
     private String color;
     @JsonProperty("text_color")
@@ -15,6 +17,10 @@ public class Team {
 
     public String getName() {
         return name;
+    }
+
+    public Constructor getConstructor() {
+        return constructor;
     }
 
     public String getColor() {

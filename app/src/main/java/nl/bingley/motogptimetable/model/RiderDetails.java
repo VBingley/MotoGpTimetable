@@ -8,6 +8,7 @@ public class RiderDetails {
     private final String name;
     private final String surname;
     private final String teamName;
+    private final String constructor;
     private final String color;
     private final String textColor;
 
@@ -16,6 +17,7 @@ public class RiderDetails {
         this.name = riderInfo.getName();
         this.surname = riderInfo.getSurname();
         this.teamName = riderInfo.getCareer().getTeam().getName();
+        this.constructor = riderInfo.getCareer().getTeam().getConstructor().getName();
         this.color = riderInfo.getCareer().getTeam().getColor();
         this.textColor = riderInfo.getCareer().getTeam().getTextColor();
     }
@@ -34,6 +36,10 @@ public class RiderDetails {
 
     public String getTeamName() {
         return teamName;
+    }
+
+    public String getConstructor() {
+        return constructor;
     }
 
     public String getColor() {

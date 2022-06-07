@@ -14,6 +14,7 @@ public class TableData {
     private Collection<Rider> riders = new ArrayList<>();
     private Collection<RiderDetails> riderDetailsList = new ArrayList<>();
 
+    private ColumnType columnNumber = ColumnType.Number;
     private ColumnType columnName = ColumnType.ShortName;
     private ColumnType columnLapTime = ColumnType.BestLapTime;
     private ColumnType columnGap = ColumnType.LeadGap;
@@ -46,10 +47,6 @@ public class TableData {
         return columnName;
     }
 
-    public void setColumnName(ColumnType columnName) {
-        this.columnName = columnName;
-    }
-
     public ColumnType getColumnLapTime() {
         return columnLapTime;
     }
@@ -66,6 +63,10 @@ public class TableData {
         this.columnGap = columnGap;
     }
 
+    public boolean isColumnNumberTypeNumber() {
+        return columnNumber == ColumnType.Number;
+    }
+
     public boolean isColumnNameTypeLong() {
         return columnName == ColumnType.LongName;
     }
@@ -76,6 +77,14 @@ public class TableData {
 
     public boolean isColumnGapTypeLead() {
         return columnGap == ColumnType.LeadGap;
+    }
+
+    public void toggleColumnNumber() {
+        if (isColumnNumberTypeNumber()) {
+            columnNumber = ColumnType.Constructor;
+        } else {
+            columnNumber = ColumnType.Number;
+        }
     }
 
     public void toggleColumnName() {

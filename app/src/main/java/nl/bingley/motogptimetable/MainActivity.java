@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            Snackbar.make(binding.toolbar, "There are no settings, maybe later.", Snackbar.LENGTH_LONG)
+            Snackbar.make(binding.toolbar, "There are no settings yet, maybe later. Tap a column to change the data.", Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show();
             return true;
         }

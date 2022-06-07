@@ -26,6 +26,8 @@ public class Rider {
 	private String lastTime;
 	@JsonProperty("gap_prev")
 	private String previousGap;
+	@JsonProperty("on_pit")
+	private String onPit;
 
 	private int lastPosition;
 	private LocalDateTime lastPositionChange;
@@ -77,6 +79,10 @@ public class Rider {
 		return previousGap;
 	}
 
+	public boolean isInPit() {
+		return "P".equalsIgnoreCase(onPit);
+	}
+
 	public int getLastPosition() {
 		return lastPosition;
 	}
@@ -91,5 +97,17 @@ public class Rider {
 
 	public void setLastPositionChange(LocalDateTime lastPositionChange) {
 		this.lastPositionChange = lastPositionChange;
+	}
+
+	public boolean hasRecentlyCrashed() {
+		return lastPosition != -1 && position == -1;
+	}
+
+	public boolean hasGainedPosition() {
+		return lastPosition > position && lastPosition != -1;
+	}
+
+	public boolean hasLostPosition() {
+		return lastPosition < position && lastPosition != -1;
 	}
 }
