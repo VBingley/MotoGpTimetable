@@ -10,7 +10,7 @@ import nl.bingley.motogptimetable.model.livetiming.Rider;
 
 public class TableData {
 
-    private Category category;
+    private Category category = new Category();
     private Collection<Rider> riders = new ArrayList<>();
     private Collection<RiderDetails> riderDetailsList = new ArrayList<>();
 
@@ -18,6 +18,8 @@ public class TableData {
     private ColumnType columnName = ColumnType.ShortName;
     private ColumnType columnLapTime = ColumnType.BestLapTime;
     private ColumnType columnGap = ColumnType.LeadGap;
+
+    private String error = null;
 
     public Category getCategory() {
         return category;
@@ -61,6 +63,18 @@ public class TableData {
 
     public void setColumnGap(ColumnType columnGap) {
         this.columnGap = columnGap;
+    }
+
+    public boolean hasError() {
+        return error != null;
+    }
+
+    public String getError() {
+        return error;
+    }
+
+    public void setError(String error) {
+        this.error = error;
     }
 
     public boolean isColumnNumberTypeNumber() {

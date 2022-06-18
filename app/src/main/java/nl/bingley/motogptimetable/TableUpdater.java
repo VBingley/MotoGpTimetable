@@ -12,24 +12,44 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 
+import com.google.android.material.snackbar.Snackbar;
+
 import nl.bingley.motogptimetable.model.RiderDetails;
 import nl.bingley.motogptimetable.model.livetiming.Category;
 import nl.bingley.motogptimetable.model.livetiming.Rider;
 
-public class TableUpdater {
+public class TableUpdater extends Thread {
 
     private static final int TEXT_SIZE = 16;
 
     private final Toolbar toolbar;
     private final TableLayout table;
     private final TableData tableData;
-    private final DurationConverter durationConverter;
+    private final SessionRemainingCounter sessionRemainingCounter;
+    private final MainActivity activity;
 
-    public TableUpdater(Toolbar toolbar, TableLayout table, TableData tableData) {
+    public TableUpdater(MainActivity activity, Toolbar toolbar, TableLayout table, TableData tableData) {
+        this.activity = activity;
         this.toolbar = toolbar;
         this.table = table;
         this.tableData = tableData;
-        durationConverter = new DurationConverter(0);
+        sessionRemainingCounter = new SessionRemainingCounter(0);
+    }
+
+    @Override
+    public void run() {
+        new Thread(() -> {
+            while (!Thread.interrupted()) {
+                try {
+                    activity.runOnUiThread(this::refreshTable);
+                    Thread.sleep(1000L);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            Snackbar.make(toolbar, "Error while updating the UI! Updating has stopped!", Snackbar.LENGTH_LONG)
+                    .setAction("Action", null).show();
+        }).start();
     }
 
     public void refreshTable() {
@@ -37,6 +57,12 @@ public class TableUpdater {
         setViewTitle(tableData.getCategory());
         addHeaderToTable();
         tableData.getRiders().forEach(this::addRiderRowToTable);
+
+        if (tableData.hasError()) {
+            Snackbar.make(toolbar, tableData.getError(), Snackbar.LENGTH_LONG)
+                    .setAction("Action", null).show();
+            tableData.setError(null);
+        }
     }
 
     private void setViewTitle(Category category) {
@@ -56,7 +82,7 @@ public class TableUpdater {
             case Practice:
             case Qualifying:
                 int remaining = Integer.parseInt(category.getRemaining());
-                return durationConverter.getDurationString(remaining) + " remaining";
+                return sessionRemainingCounter.getRemainingString(remaining) + " remaining";
             case Race:
                 return category.getRemaining() + "/" + category.getDuration() + " laps remaining";
             default:
@@ -69,7 +95,7 @@ public class TableUpdater {
             case Practice:
             case Qualifying:
                 int remaining = Integer.parseInt(category.getRemaining());
-                return durationConverter.getDurationString(remaining);
+                return sessionRemainingCounter.buildString(remaining);
             case Race:
                 return category.getDuration() + " laps";
             default:

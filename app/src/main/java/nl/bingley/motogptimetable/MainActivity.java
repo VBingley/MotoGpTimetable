@@ -63,9 +63,9 @@ public class MainActivity extends AppCompatActivity {
         super.onPostCreate(savedInstanceState);
 
         TableData tableData = new TableData();
-        TableUpdater tableUpdater = new TableUpdater(binding.toolbar, binding.table, tableData);
         RequestQueue queue = Volley.newRequestQueue(this);
-        new DataUpdater(queue, tableUpdater, tableData)
-                .start();
+        new DataUpdater(queue, tableData).start();
+
+        new TableUpdater(this, binding.toolbar, binding.table, tableData).start();
     }
 }

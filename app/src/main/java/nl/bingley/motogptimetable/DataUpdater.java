@@ -7,11 +7,13 @@ import com.android.volley.toolbox.StringRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import nl.bingley.motogptimetable.model.RiderDetails;
@@ -32,12 +34,10 @@ public class DataUpdater extends Thread {
     private static final String riderInfoUrl = "/riders?category=";
 
     private final RequestQueue queue;
-    private final TableUpdater tableUpdater;
     private final TableData tableData;
 
-    public DataUpdater(RequestQueue queue, TableUpdater tableUpdater, TableData tableData) {
+    public DataUpdater(RequestQueue queue, TableData tableData) {
         this.queue = queue;
-        this.tableUpdater = tableUpdater;
         this.tableData = tableData;
     }
 
@@ -45,20 +45,20 @@ public class DataUpdater extends Thread {
     public void run() {
         StringRequest stringRequest = new StringRequest(Request.Method.GET, liveTimingUrl,
                 this::handleLiveTimingResponse,
-                error -> tableUpdater.addTextRowToTable(new String[]{"Err1"}));
+                error -> tableData.setError("Error requesting live-timing data!"));
         stringRequest.setRetryPolicy(new DefaultRetryPolicy(2500, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
-        Thread thread = new Thread(() -> {
+        new Thread(() -> {
             while (!Thread.interrupted()) {
                 try {
                     queue.add(stringRequest);
-                    Thread.sleep(3000L);
+                    Thread.sleep(2000L);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
-        });
-        thread.start();
+            tableData.setError("Error updating live-timing data! Updating has stopped!");
+        }).start();
     }
 
     private void handleLiveTimingResponse(String response) {
@@ -77,9 +77,8 @@ public class DataUpdater extends Thread {
                 tableData.setCategory(newCategory);
                 tableData.setRiders(fillNewRiderList(tableData.getRiders(), timingSheet.getLapTimes().getRiders().values()));
             }
-            tableUpdater.refreshTable();
         } catch (JsonProcessingException e) {
-            tableUpdater.addTextRowToTable(new String[]{"Err2"});
+            tableData.setError("Error processing live-timing data!");
         }
     }
 
@@ -98,7 +97,8 @@ public class DataUpdater extends Thread {
     }
 
     private void fetchRiderDetails() {
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, detailsBaseUrl + tableData.getCategory().getYear() + seasonUrl, this::handleSeasonResponse, null);
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, detailsBaseUrl + tableData.getCategory().getYear() + seasonUrl,
+                this::handleSeasonResponse, error -> tableData.setError("Error requesting championship data!"));
         stringRequest.setRetryPolicy(new DefaultRetryPolicy(2500, 10, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         queue.add(stringRequest);
     }
@@ -108,16 +108,19 @@ public class DataUpdater extends Thread {
             List<Season> seasons = new ObjectMapper().readValue(response, new TypeReference<List<Season>>() {
             });
             Category category = tableData.getCategory();
-            seasons.stream()
+            Optional<Season> currentSeason = seasons.stream()
                     .filter(season -> season.getLegacyId() == category.getId())
-                    .findFirst()
-                    .ifPresent(season -> {
-                        StringRequest stringRequest = new StringRequest(Request.Method.GET, detailsBaseUrl + category.getYear() + riderInfoUrl + season.getId(), this::handleRiderInfoResponse, null);
-                        stringRequest.setRetryPolicy(new DefaultRetryPolicy(2500, 10, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-                        queue.add(stringRequest);
-                    });
+                    .findFirst();
+            if (currentSeason.isPresent()) {
+                StringRequest stringRequest = new StringRequest(Request.Method.GET, detailsBaseUrl + category.getYear() + riderInfoUrl + currentSeason.get().getId(),
+                        this::handleRiderInfoResponse, error -> tableData.setError("Error requesting rider details data!"));
+                stringRequest.setRetryPolicy(new DefaultRetryPolicy(2500, 10, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+                queue.add(stringRequest);
+            } else {
+                tableData.setError("Team colors are not available for " + category.getName());
+            }
         } catch (JsonProcessingException e) {
-            // Not that important
+            tableData.setError("Error processing championship data!");
         }
     }
 
@@ -128,9 +131,8 @@ public class DataUpdater extends Thread {
             tableData.setRiderDetailsList(riderInfoList.stream()
                     .map(RiderDetails::new)
                     .collect(Collectors.toList()));
-            tableUpdater.refreshTable();
         } catch (JsonProcessingException e) {
-            // Not that important
+            tableData.setError("Error processing rider details data!");
         }
     }
 
