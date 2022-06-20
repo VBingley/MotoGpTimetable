@@ -104,10 +104,10 @@ public class Rider {
 	}
 
 	public boolean hasGainedPosition() {
-		return lastPosition > position && lastPosition != -1;
+		return lastPosition > position && lastPosition != -1 && position != -1;
 	}
 
 	public boolean hasLostPosition() {
-		return lastPosition < position && lastPosition != -1;
+		return (lastPosition < position || position == -1) && lastPosition != -1;
 	}
 }

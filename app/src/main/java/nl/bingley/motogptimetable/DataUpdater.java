@@ -52,7 +52,7 @@ public class DataUpdater extends Thread {
             while (!Thread.interrupted()) {
                 try {
                     queue.add(stringRequest);
-                    Thread.sleep(2000L);
+                    Thread.sleep(2500L);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

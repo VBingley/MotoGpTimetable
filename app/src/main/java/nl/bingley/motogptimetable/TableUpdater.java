@@ -117,6 +117,7 @@ public class TableUpdater extends Thread {
                 .filter(riderD -> riderD.getId() == rider.getId())
                 .findFirst().orElse(null);
         TableRow row = new TableRow(table.getContext());
+        row.setPadding(0, 2, 0, 2);
         setRowBackgroundColor(row, rider);
 
         // POS
@@ -125,9 +126,7 @@ public class TableUpdater extends Thread {
 
         // NUM
         TextView numberTextView = getNumberTextView(rider, riderDetails, row.getContext());
-        TableRow.LayoutParams params = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
-        params.setMargins(2, 2, 2, 2);
-        row.addView(numberTextView, params);
+        row.addView(numberTextView);
 
         // NAME
         TextView nameTextView = getNameTextView(rider, riderDetails, row.getContext());
@@ -176,6 +175,7 @@ public class TableUpdater extends Thread {
             numberTextView.setBackgroundColor(Color.parseColor(riderDetails.getColor()));
             numberTextView.setTextColor(Color.parseColor(riderDetails.getTextColor()));
         }
+
         numberTextView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
         return numberTextView;
     }
