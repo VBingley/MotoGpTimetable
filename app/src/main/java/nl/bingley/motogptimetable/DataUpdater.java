@@ -144,17 +144,20 @@ public class DataUpdater extends Thread {
                     SetNewRiderPositionChanged(newRider, oldRider);
                     SetNewRiderBestTime(newRider, oldRider);
                 }));
+        SetRiderFastestLap(newRiderList);
         return newRiderList;
     }
 
     private static void SetNewRiderPositionChanged(Rider newRider, Rider oldRider) {
+        newRider.setLastPositionChange(LocalDateTime.now());
         if (newRider.getPosition() == oldRider.getPosition()) {
             // Position didn't change, use previous timeout date
             newRider.setLastPositionChange(oldRider.getLastPositionChange());
+            newRider.setPositionChangeDirection(oldRider.getPositionChangeDirection());
         } else if (newRider.getPosition() == -1) {
             // Crashed
             newRider.setPositionChangeDirection(Rider.positionChangeDirectionType.DNF);
-        } else if (newRider.getPosition() < oldRider.getPosition()) {
+        } else if (newRider.getPosition() < oldRider.getPosition() || oldRider.getPosition() == -1) {
             // Gained position
             newRider.setPositionChangeDirection(Rider.positionChangeDirectionType.GAINED);
         } else if (newRider.getPosition() > oldRider.getPosition()) {
@@ -164,13 +167,19 @@ public class DataUpdater extends Thread {
     }
 
     private static void SetNewRiderBestTime(Rider newRider, Rider oldRider) {
+        newRider.setLastBestTimeChange(LocalDateTime.now());
         List<String> lapTimes = new ArrayList<>();
         lapTimes.add(oldRider.getLastTime());
         lapTimes.add(oldRider.getBestTime());
         lapTimes.add(newRider.getLastTime());
         lapTimes.add(newRider.getBestTime());
-        Collections.sort(lapTimes);
-        newRider.setBestTime(lapTimes.get(0));
+        Optional<String> bestTime = lapTimes.stream()
+                .sorted()
+                .filter(lapTime -> !lapTime.equals(""))
+                .filter(lapTime -> lapTime.length() == 8)
+                .findFirst();
+
+        bestTime.ifPresent(newRider::setBestTime);
 
         if (newRider.getBestTime().equals(oldRider.getBestTime())) {
             newRider.setLastBestTimeChange(oldRider.getLastBestTimeChange());

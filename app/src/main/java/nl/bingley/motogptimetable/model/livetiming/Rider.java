@@ -124,6 +124,10 @@ public class Rider {
         this.lastBestTimeChange = lastBestTimeChange;
     }
 
+    public positionChangeDirectionType getPositionChangeDirection() {
+        return positionChangeDirection;
+    }
+
     public void setPositionChangeDirection(positionChangeDirectionType positionChangeDirection) {
         this.positionChangeDirection = positionChangeDirection;
     }
@@ -141,10 +145,10 @@ public class Rider {
     }
 
     public boolean hasRecentlyImprovedBestTime() {
-        return lastBestTimeChange.plusSeconds(TableUpdaterHelper.highlightTimeout).isAfter(LocalDateTime.now());
+        return isChangeRecent(lastBestTimeChange);
     }
 
     private boolean isChangeRecent(LocalDateTime lastChange) {
-        return lastChange.plusSeconds(TableUpdaterHelper.highlightTimeout).isAfter(LocalDateTime.now());
+        return LocalDateTime.now().minusSeconds(TableUpdaterHelper.highlightTimeout).isBefore(lastChange);
     }
 }
