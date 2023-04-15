@@ -65,9 +65,7 @@ public class TableColumnUpdater {
 
     public static TextView getLapTimeTextView(TableData tableData, Rider rider, Context context) {
         String lapTime;
-        if (rider.getPosition() == -1) {
-            lapTime = "";
-        } else if (tableData.isColumnLapTimeTypeBest()) {
+        if (tableData.isColumnLapTimeTypeBest()) {
             lapTime = rider.getBestTime();
         } else {
             lapTime = rider.getLastTime();

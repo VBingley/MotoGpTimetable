@@ -167,27 +167,35 @@ public class DataUpdater extends Thread {
     }
 
     private static void SetNewRiderBestTime(Rider newRider, Rider oldRider) {
-        newRider.setLastBestTimeChange(LocalDateTime.now());
-        List<String> lapTimes = new ArrayList<>();
-        lapTimes.add(oldRider.getLastTime());
-        lapTimes.add(oldRider.getBestTime());
-        lapTimes.add(newRider.getLastTime());
-        lapTimes.add(newRider.getBestTime());
-        Optional<String> bestTime = lapTimes.stream()
-                .sorted()
-                .filter(lapTime -> !lapTime.equals(""))
-                .filter(lapTime -> lapTime.length() == 8)
-                .findFirst();
+        if (newRider.getLastTime().equals("")) {
+            newRider.setBestTime("");
+        } else {
+            newRider.setLastBestTimeChange(LocalDateTime.now());
+            List<String> lapTimes = new ArrayList<>();
+            lapTimes.add(oldRider.getLastTime());
+            lapTimes.add(oldRider.getBestTime());
+            lapTimes.add(newRider.getLastTime());
+            lapTimes.add(newRider.getBestTime());
 
-        bestTime.ifPresent(newRider::setBestTime);
+            lapTimes = lapTimes.stream()
+                    .sorted()
+                    .filter(lapTime -> !lapTime.equals(""))
+                    .filter(lapTime -> lapTime.length() == 8)
+                    .collect(Collectors.toList());
 
-        if (newRider.getBestTime().equals(oldRider.getBestTime())) {
-            newRider.setLastBestTimeChange(oldRider.getLastBestTimeChange());
+            if (lapTimes.size() > 0) {
+                newRider.setBestTime(lapTimes.get(0));
+            }
+
+            if (lapTimes.size() <= 2 || newRider.getBestTime().equals(oldRider.getBestTime())) {
+                newRider.setLastBestTimeChange(oldRider.getLastBestTimeChange());
+            }
         }
     }
 
     private static void SetRiderFastestLap(Collection<Rider> riders) {
         riders.stream()
+                .filter(rider -> !rider.getBestTime().equals(""))
                 .min(Comparator.comparing(Rider::getBestTime))
                 .ifPresent(rider -> rider.setHasFastestLap(true));
     }
