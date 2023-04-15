@@ -11,5 +11,5 @@ A simple Android app that uses a publicly available API to display live timing d
 <details>
   <summary>MotoGP Race</summary>
   
-  ![race](https://github.com/VBingley/MotoGpTimetable/tbd/temp.png)
+  ![race](https://github.com/VBingley/MotoGpTimetable/blob/master/screenshots/MotoGP_Race.png)
 </details>
