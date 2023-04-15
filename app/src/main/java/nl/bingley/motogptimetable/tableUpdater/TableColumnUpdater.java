@@ -11,6 +11,7 @@ import androidx.annotation.Nullable;
 import nl.bingley.motogptimetable.TableData;
 import nl.bingley.motogptimetable.model.RiderDetails;
 import nl.bingley.motogptimetable.model.livetiming.Rider;
+import nl.bingley.motogptimetable.model.livetiming.SessionType;
 
 public class TableColumnUpdater {
 
@@ -71,7 +72,14 @@ public class TableColumnUpdater {
         } else {
             lapTime = rider.getLastTime();
         }
-        return TableUpdaterHelper.createRiderTextView(lapTime, context);
+        TextView textView = TableUpdaterHelper.createRiderTextView(lapTime, context);
+        if (rider.hasFastestLap() && rider.hasRecentlyImprovedBestTime() && tableData.getCategory().getType() == SessionType.Race) {
+            textView.setBackgroundColor(TableUpdaterHelper.RED);
+        } else if(rider.hasRecentlyImprovedBestTime() && tableData.getCategory().getType() == SessionType.Race) {
+            textView.setBackgroundColor(TableUpdaterHelper.ORANGE);
+        }
+
+        return textView;
     }
 
     public static TextView getGapTextView(TableData tableData, Rider rider, Context context) {

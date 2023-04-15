@@ -1,6 +1,7 @@
 package nl.bingley.motogptimetable.tableUpdater;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.util.TypedValue;
 import android.view.View;
 import android.widget.TableLayout;
@@ -12,6 +13,10 @@ public class TableUpdaterHelper {
     public static final int highlightTimeout = 15;
 
     private static final int TEXT_SIZE = 16;
+
+    public static final int GREEN = Color.argb(51, 0, 255, 0);
+    public static final int RED = Color.argb(51, 255, 0, 0);
+    public static final int ORANGE = Color.argb(51, 255, 165, 0);
 
     public static TextView createRiderTextView(String message, Context context) {
         TextView text = new TextView(context);

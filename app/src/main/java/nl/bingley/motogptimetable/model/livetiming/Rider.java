@@ -31,7 +31,9 @@ public class Rider {
     @JsonProperty("on_pit")
     private String onPit;
 
+    private boolean hasFastestLap;
     private positionChangeDirectionType positionChangeDirection;
+
     public enum positionChangeDirectionType {
         GAINED,
         LOST,
@@ -42,6 +44,7 @@ public class Rider {
     private LocalDateTime lastBestTimeChange;
 
     public Rider() {
+        hasFastestLap = false;
         positionChangeDirection = positionChangeDirectionType.GAINED;
         lastPositionChange = LocalDateTime.now().minusSeconds(TableUpdaterHelper.highlightTimeout);
         lastBestTimeChange = LocalDateTime.now().minusSeconds(TableUpdaterHelper.highlightTimeout);
@@ -95,6 +98,14 @@ public class Rider {
 
     public boolean isInPit() {
         return "P".equalsIgnoreCase(onPit);
+    }
+
+    public boolean hasFastestLap() {
+        return hasFastestLap;
+    }
+
+    public void setHasFastestLap(boolean hasFastestLap) {
+        this.hasFastestLap = hasFastestLap;
     }
 
     public LocalDateTime getLastPositionChange() {
