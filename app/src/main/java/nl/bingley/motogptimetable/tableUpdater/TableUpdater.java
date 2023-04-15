@@ -1,26 +1,22 @@
-package nl.bingley.motogptimetable;
+package nl.bingley.motogptimetable.tableUpdater;
 
-import android.content.Context;
 import android.graphics.Color;
-import android.graphics.Typeface;
-import android.util.TypedValue;
-import android.view.View;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 
 import com.google.android.material.snackbar.Snackbar;
 
+import nl.bingley.motogptimetable.MainActivity;
+import nl.bingley.motogptimetable.SessionRemainingCounter;
+import nl.bingley.motogptimetable.TableData;
 import nl.bingley.motogptimetable.model.RiderDetails;
 import nl.bingley.motogptimetable.model.livetiming.Category;
 import nl.bingley.motogptimetable.model.livetiming.Rider;
 
 public class TableUpdater extends Thread {
-
-    private static final int TEXT_SIZE = 16;
 
     private final Toolbar toolbar;
     private final TableLayout table;
@@ -109,7 +105,7 @@ public class TableUpdater extends Thread {
         String gap = tableData.isColumnGapTypeLead() ? "Lead" : "Gap";
 
         String[] headers = new String[]{"Pos", number, "Name", lapTime, gap};
-        addTextRowToTable(headers);
+        TableUpdaterHelper.addTextRowToTable(table, headers);
     }
 
     public void addRiderRowToTable(Rider rider) {
@@ -121,133 +117,38 @@ public class TableUpdater extends Thread {
         setRowBackgroundColor(row, rider);
 
         // POS
-        TextView positionTextView = getPositionTextView(rider, row.getContext());
+        TextView positionTextView = TableColumnUpdater.getPositionTextView(rider, row.getContext());
         row.addView(positionTextView);
 
         // NUM
-        TextView numberTextView = getNumberTextView(rider, riderDetails, row.getContext());
+        TextView numberTextView = TableColumnUpdater.getNumberTextView(tableData, rider, riderDetails, row.getContext());
+        numberTextView.setOnClickListener(v -> columnNumberClickHandler());
         row.addView(numberTextView);
 
         // NAME
-        TextView nameTextView = getNameTextView(rider, riderDetails, row.getContext());
+        TextView nameTextView = TableColumnUpdater.getNameTextView(tableData, rider, riderDetails, row.getContext());
+        nameTextView.setOnClickListener(v -> columnNameClickHandler());
         row.addView(nameTextView);
 
         // LAP-TIME
-        TextView lapTimeTextView = getLapTimeTextView(rider, row.getContext());
+        TextView lapTimeTextView = TableColumnUpdater.getLapTimeTextView(tableData, rider, row.getContext());
+        lapTimeTextView.setOnClickListener(v -> columnLapTimeClickHandler());
         row.addView(lapTimeTextView);
 
         // GAP
-        TextView gapTextView = getGapTextView(rider, row.getContext());
+        TextView gapTextView = TableColumnUpdater.getGapTextView(tableData, rider, row.getContext());
+        gapTextView.setOnClickListener(v -> columnGapClickHandler());
         row.addView(gapTextView);
 
         table.addView(row);
     }
 
-    private TextView getPositionTextView(Rider rider, Context context) {
-        String positionString = String.valueOf(rider.getPosition());
-        positionString = positionString.equals("-1") ? "-" : positionString;
-        positionString = positionString.length() == 1 ? " " + positionString : positionString;
-
-        if (rider.isInPit()) {
-            positionString = "P " + positionString;
-        } else if (rider.hasLostPosition()) {
-            positionString = "v " + positionString;
-        } else if (rider.hasGainedPosition()) {
-            positionString = "^ " + positionString;
-        } else {
-            positionString = "  " + positionString;
-        }
-        TextView positionTextView = createRiderTextView(positionString, context);
-        positionTextView.setTypeface(Typeface.MONOSPACE);
-        positionTextView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-        return positionTextView;
-    }
-
-    private TextView getNumberTextView(Rider rider, @Nullable RiderDetails riderDetails, Context context) {
-        TextView numberTextView;
-        if (tableData.isColumnNumberTypeNumber() || riderDetails == null) {
-            numberTextView = createRiderTextView(String.valueOf(rider.getNumber()), context);
-        } else {
-            numberTextView = createRiderTextView(riderDetails.getConstructor(), context);
-        }
-        if (riderDetails != null) {
-            numberTextView.setOnClickListener(v -> columnNumberClickHandler());
-            numberTextView.setBackgroundColor(Color.parseColor(riderDetails.getColor()));
-            numberTextView.setTextColor(Color.parseColor(riderDetails.getTextColor()));
-        }
-
-        numberTextView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-        return numberTextView;
-    }
-
-    private TextView getNameTextView(Rider rider, @Nullable RiderDetails riderDetails, Context context) {
-        String name;
-        if (tableData.isColumnNameTypeLong() && riderDetails != null) {
-            name = riderDetails.getName().charAt(0) + ". " + riderDetails.getSurname();
-        } else if (tableData.isColumnNameTypeLong()) {
-            name = rider.getName().charAt(0) + ". " + rider.getSurname().charAt(0) + rider.getSurname().substring(1).toLowerCase();
-        } else {
-            name = rider.getName().charAt(0) + " " + rider.getSurname().replace(" ", "").substring(0, 3);
-        }
-        TextView nameTextView = createRiderTextView(name, context);
-        nameTextView.setOnClickListener(v -> columnNameClickHandler());
-        return nameTextView;
-    }
-
-    private TextView getLapTimeTextView(Rider rider, Context context) {
-        String lapTime;
-        if (rider.getPosition() == -1) {
-            lapTime = "";
-        } else if (tableData.isColumnLapTimeTypeBest()) {
-            lapTime = rider.getLapTime();
-        } else {
-            lapTime = rider.getLastTime();
-        }
-        TextView lapTimeTextView = createRiderTextView(lapTime, context);
-        lapTimeTextView.setOnClickListener(v -> columnLapTimeClickHandler());
-        return lapTimeTextView;
-    }
-
-    private TextView getGapTextView(Rider rider, Context context) {
-        String gap;
-        if (rider.getPosition() == -1) {
-            gap = "";
-        } else if (tableData.isColumnGapTypeLead()) {
-            gap = rider.getLeadGap();
-        } else {
-            gap = rider.getPreviousGap();
-        }
-        TextView gapTextView = createRiderTextView(gap, context);
-        gapTextView.setOnClickListener(v -> columnGapClickHandler());
-        return gapTextView;
-    }
-
-    public void addTextRowToTable(String[] messages) {
-        TableRow row = new TableRow(table.getContext());
-        for (String message : messages) {
-            TextView text = new TextView(row.getContext());
-            text.setTextSize(TypedValue.COMPLEX_UNIT_SP, TEXT_SIZE);
-            text.setText(message);
-            text.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-            row.addView(text);
-        }
-        table.addView(row);
-    }
-
-    private TextView createRiderTextView(String message, Context context) {
-        TextView text = new TextView(context);
-        text.setTextSize(TypedValue.COMPLEX_UNIT_SP, TEXT_SIZE);
-        text.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_END);
-        text.setText(message);
-        return text;
-    }
-
     private void setRowBackgroundColor(TableRow row, Rider rider) {
         if (rider.hasRecentlyCrashed()) {
             row.setBackgroundColor(Color.argb(51, 255, 165, 0));
-        } else if (rider.hasGainedPosition()) {
+        } else if (rider.hasRecentlyGainedPosition()) {
             row.setBackgroundColor(Color.argb(51, 0, 255, 0));
-        } else if (rider.hasLostPosition()) {
+        } else if (rider.hasRecentlyLostPosition()) {
             row.setBackgroundColor(Color.argb(51, 255, 0, 0));
         }
     }

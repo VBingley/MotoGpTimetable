@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.ui.AppBarConfiguration;
 
 import nl.bingley.motogptimetable.databinding.ActivityMainBinding;
+import nl.bingley.motogptimetable.tableUpdater.TableUpdater;
 
 import android.view.Menu;
 import android.view.MenuItem;

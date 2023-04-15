@@ -7,11 +7,11 @@ import com.android.volley.toolbox.StringRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.android.material.snackbar.Snackbar;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -24,10 +24,10 @@ import nl.bingley.motogptimetable.model.livetiming.ColumnType;
 import nl.bingley.motogptimetable.model.livetiming.Rider;
 import nl.bingley.motogptimetable.model.livetiming.SessionType;
 import nl.bingley.motogptimetable.model.livetiming.TimingSheet;
+import nl.bingley.motogptimetable.tableUpdater.TableUpdaterHelper;
 
 public class DataUpdater extends Thread {
 
-    private static final int positionTimeout = 15;
     private static final String liveTimingUrl = "https://www.motogp.com/en/json/live_timing/1";
     private static final String detailsBaseUrl = "https://api.motogp.com/riders-api/season/";
     private static final String seasonUrl = "/categories";
@@ -140,19 +140,39 @@ public class DataUpdater extends Thread {
         newRiderList.forEach(newRider -> oldRiderList.stream()
                 .filter(oldRider -> oldRider.getNumber() == newRider.getNumber())
                 .findAny().ifPresent(oldRider -> {
-                    if (newRider.getPosition() != oldRider.getPosition()) {
-                        // Position changed before timeout
-                        newRider.setLastPosition(oldRider.getPosition());
-                    } else if (newRider.getPosition() == oldRider.getPosition() && oldRider.getLastPositionChange().isAfter(LocalDateTime.now().minusSeconds(positionTimeout))) {
-                        // Position change is recent, keep lastPosition
-                        newRider.setLastPosition(oldRider.getLastPosition());
-                        newRider.setLastPositionChange(oldRider.getLastPositionChange());
-                    } else {
-                        // Position hasn't changed
-                        newRider.setLastPosition(newRider.getPosition());
-                        newRider.setLastPositionChange(oldRider.getLastPositionChange());
-                    }
+                    SetNewRiderPositionChanged(newRider, oldRider);
+                    SetNewRiderBestTime(newRider, oldRider);
                 }));
         return newRiderList;
+    }
+
+    private static void SetNewRiderPositionChanged(Rider newRider, Rider oldRider) {
+        if (newRider.getPosition() == oldRider.getPosition()) {
+            // Position didn't change, use previous timeout date
+            newRider.setLastPositionChange(oldRider.getLastPositionChange());
+        } else if (newRider.getPosition() == -1) {
+            // Crashed
+            newRider.setPositionChangeDirection(Rider.positionChangeDirectionType.DNF);
+        } else if (newRider.getPosition() < oldRider.getPosition()) {
+            // Gained position
+            newRider.setPositionChangeDirection(Rider.positionChangeDirectionType.GAINED);
+        } else if (newRider.getPosition() > oldRider.getPosition()) {
+            // Lost position
+            newRider.setPositionChangeDirection(Rider.positionChangeDirectionType.LOST);
+        }
+    }
+
+    private static void SetNewRiderBestTime(Rider newRider, Rider oldRider) {
+        List<String> lapTimes = new ArrayList<>();
+        lapTimes.add(oldRider.getLastTime());
+        lapTimes.add(oldRider.getBestTime());
+        lapTimes.add(newRider.getLastTime());
+        lapTimes.add(newRider.getBestTime());
+        Collections.sort(lapTimes);
+        newRider.setBestTime(lapTimes.get(0));
+
+        if (newRider.getBestTime().equals(oldRider.getBestTime())) {
+            newRider.setLastBestTimeChange(oldRider.getLastBestTimeChange());
+        }
     }
 }

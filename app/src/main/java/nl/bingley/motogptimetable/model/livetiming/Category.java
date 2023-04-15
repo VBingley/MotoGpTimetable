@@ -57,7 +57,7 @@ public class Category {
             return SessionType.Practice;
         } else if (sessionName.toLowerCase().contains("qualifying")) {
             return SessionType.Qualifying;
-        } else if (sessionName.toLowerCase().contains("race")) {
+        } else if (sessionName.toLowerCase().contains("race") || sessionName.toLowerCase().contains("sprint")) {
             return SessionType.Race;
         } else {
             return SessionType.Unknown;
