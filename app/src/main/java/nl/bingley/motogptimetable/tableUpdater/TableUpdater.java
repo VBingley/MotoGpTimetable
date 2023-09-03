@@ -1,6 +1,5 @@
 package nl.bingley.motogptimetable.tableUpdater;
 
-import android.graphics.Color;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;

@@ -29,7 +29,7 @@ import nl.bingley.motogptimetable.tableUpdater.TableUpdaterHelper;
 
 public class DataUpdater extends Thread {
 
-    private static final String liveTimingUrl = "https://www.motogp.com/en/json/live_timing/1";
+    private static final String liveTimingUrl = "https://api.motogp.pulselive.com/motogp/v1/timing-gateway/livetiming-lite";
     private static final String detailsBaseUrl = "https://api.motogp.com/riders-api/season/";
     private static final String seasonUrl = "/categories";
     private static final String riderInfoUrl = "/riders?category=";
@@ -72,11 +72,11 @@ public class DataUpdater extends Thread {
                 tableData.setCategory(newCategory);
                 tableData.setRiders(new ArrayList<>());
                 tableData.setRiderDetailsList(new ArrayList<>());
-                tableData.setRiders(fillNewRiderList(tableData.getRiders(), timingSheet.getLapTimes().getRiders().values()));
+                tableData.setRiders(fillNewRiderList(tableData.getRiders(), timingSheet.getLapTimes().getRiders().values(), newCategory));
                 fetchRiderDetails();
             } else {
                 tableData.setCategory(newCategory);
-                tableData.setRiders(fillNewRiderList(tableData.getRiders(), timingSheet.getLapTimes().getRiders().values()));
+                tableData.setRiders(fillNewRiderList(tableData.getRiders(), timingSheet.getLapTimes().getRiders().values(), newCategory));
             }
         } catch (JsonProcessingException e) {
             tableData.setError("Error processing live-timing data!");
@@ -137,12 +137,12 @@ public class DataUpdater extends Thread {
         }
     }
 
-    public static Collection<Rider> fillNewRiderList(Collection<Rider> oldRiderList, Collection<Rider> newRiderList) {
+    public static Collection<Rider> fillNewRiderList(Collection<Rider> oldRiderList, Collection<Rider> newRiderList, Category category) {
         newRiderList.forEach(newRider -> oldRiderList.stream()
                 .filter(oldRider -> oldRider.getNumber() == newRider.getNumber())
                 .findAny().ifPresent(oldRider -> {
                     SetNewRiderPositionChanged(newRider, oldRider);
-                    SetNewRiderBestTime(newRider, oldRider);
+                    SetNewRiderBestTime(newRider, oldRider, category);
                 }));
         SetRiderFastestLap(newRiderList);
         return newRiderList;
@@ -166,8 +166,8 @@ public class DataUpdater extends Thread {
         }
     }
 
-    private static void SetNewRiderBestTime(Rider newRider, Rider oldRider) {
-        if (newRider.getLastTime().equals("")) {
+    private static void SetNewRiderBestTime(Rider newRider, Rider oldRider, Category category) {
+        if (category.getType() == SessionType.Race && Integer.parseInt(category.getRemaining()) <= Integer.parseInt(category.getDuration()) - 2) {
             newRider.setBestTime("");
         } else {
             newRider.setLastBestTimeChange(LocalDateTime.now());
