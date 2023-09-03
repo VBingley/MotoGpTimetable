@@ -11,7 +11,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -22,10 +21,9 @@ import nl.bingley.motogptimetable.model.details.RiderInfo;
 import nl.bingley.motogptimetable.model.details.Season;
 import nl.bingley.motogptimetable.model.livetiming.Category;
 import nl.bingley.motogptimetable.model.livetiming.ColumnType;
+import nl.bingley.motogptimetable.model.livetiming.LapTimes;
 import nl.bingley.motogptimetable.model.livetiming.Rider;
 import nl.bingley.motogptimetable.model.livetiming.SessionType;
-import nl.bingley.motogptimetable.model.livetiming.TimingSheet;
-import nl.bingley.motogptimetable.tableUpdater.TableUpdaterHelper;
 
 public class DataUpdater extends Thread {
 
@@ -46,7 +44,7 @@ public class DataUpdater extends Thread {
     public void run() {
         StringRequest stringRequest = new StringRequest(Request.Method.GET, liveTimingUrl,
                 this::handleLiveTimingResponse,
-                error -> tableData.setError("Error requesting live-timing data!"));
+                error -> tableData.setError("Error requesting live-timing data! " + error.getMessage()));
         stringRequest.setRetryPolicy(new DefaultRetryPolicy(2500, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
         new Thread(() -> {
@@ -64,22 +62,22 @@ public class DataUpdater extends Thread {
 
     private void handleLiveTimingResponse(String response) {
         try {
-            TimingSheet timingSheet = new ObjectMapper().readValue(response, TimingSheet.class);
+            LapTimes lapTimes = new ObjectMapper().readValue(response, LapTimes.class);
             Category oldCategory = tableData.getCategory();
-            Category newCategory = timingSheet.getLapTimes().getCategory();
+            Category newCategory = lapTimes.getCategory();
             if (oldCategory == null || oldCategory.getType() != newCategory.getType() || !oldCategory.getName().equals(newCategory.getName())) {
                 setSessionType(newCategory.getType());
                 tableData.setCategory(newCategory);
                 tableData.setRiders(new ArrayList<>());
                 tableData.setRiderDetailsList(new ArrayList<>());
-                tableData.setRiders(fillNewRiderList(tableData.getRiders(), timingSheet.getLapTimes().getRiders().values(), newCategory));
+                tableData.setRiders(fillNewRiderList(tableData.getRiders(), lapTimes.getRiders().values(), newCategory));
                 fetchRiderDetails();
             } else {
                 tableData.setCategory(newCategory);
-                tableData.setRiders(fillNewRiderList(tableData.getRiders(), timingSheet.getLapTimes().getRiders().values(), newCategory));
+                tableData.setRiders(fillNewRiderList(tableData.getRiders(), lapTimes.getRiders().values(), newCategory));
             }
         } catch (JsonProcessingException e) {
-            tableData.setError("Error processing live-timing data!");
+            tableData.setError("Error processing live-timing data! " + e.getMessage());
         }
     }
 
