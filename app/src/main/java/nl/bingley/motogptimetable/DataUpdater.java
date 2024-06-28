@@ -42,22 +42,26 @@ public class DataUpdater extends Thread {
 
     @Override
     public void run() {
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, liveTimingUrl,
-                this::handleLiveTimingResponse,
-                error -> tableData.setError("Error requesting live-timing data! " + error.getMessage()));
-        stringRequest.setRetryPolicy(new DefaultRetryPolicy(2500, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        try {
+            StringRequest stringRequest = new StringRequest(Request.Method.GET, liveTimingUrl,
+                    this::handleLiveTimingResponse,
+                    error -> tableData.setError("Error requesting live-timing data! " + error.getMessage()));
+            stringRequest.setRetryPolicy(new DefaultRetryPolicy(2500, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
-        new Thread(() -> {
-            while (!Thread.interrupted()) {
-                try {
-                    queue.add(stringRequest);
-                    Thread.sleep(2500L);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+            new Thread(() -> {
+                while (!Thread.interrupted()) {
+                    try {
+                        queue.add(stringRequest);
+                        Thread.sleep(2500L);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
-            }
-            tableData.setError("Error updating live-timing data! Updating has stopped!");
-        }).start();
+                tableData.setError("Error updating live-timing data! Updating has stopped!");
+            }).start();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     private void handleLiveTimingResponse(String response) {
@@ -118,7 +122,7 @@ public class DataUpdater extends Thread {
             } else {
                 tableData.setError("Team colors are not available for " + category.getName());
             }
-        } catch (JsonProcessingException e) {
+        } catch (Exception e) {
             tableData.setError("Error processing championship data!");
         }
     }

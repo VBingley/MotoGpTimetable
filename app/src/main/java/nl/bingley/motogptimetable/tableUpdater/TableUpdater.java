@@ -38,7 +38,7 @@ public class TableUpdater extends Thread {
                 try {
                     activity.runOnUiThread(this::refreshTable);
                     Thread.sleep(1000L);
-                } catch (InterruptedException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -48,15 +48,19 @@ public class TableUpdater extends Thread {
     }
 
     public void refreshTable() {
-        table.removeAllViews();
-        setViewTitle(tableData.getCategory());
-        addHeaderToTable();
-        tableData.getRiders().forEach(this::addRiderRowToTable);
+        try {
+            table.removeAllViews();
+            setViewTitle(tableData.getCategory());
+            addHeaderToTable();
+            tableData.getRiders().forEach(this::addRiderRowToTable);
 
-        if (tableData.hasError()) {
-            Snackbar.make(toolbar, tableData.getError(), Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show();
-            tableData.setError(null);
+            if (tableData.hasError()) {
+                Snackbar.make(toolbar, tableData.getError(), Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+                tableData.setError(null);
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
     }
 

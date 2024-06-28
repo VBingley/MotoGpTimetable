@@ -42,7 +42,7 @@ public class TableColumnUpdater {
         } else {
             numberTextView = TableUpdaterHelper.createRiderTextView(riderDetails.getConstructor(), context);
         }
-        if (riderDetails != null) {
+        if (riderDetails != null && riderDetails.getColor() != null && riderDetails.getTextColor() != null) {
             numberTextView.setBackgroundColor(Color.parseColor(riderDetails.getColor()));
             numberTextView.setTextColor(Color.parseColor(riderDetails.getTextColor()));
         }
