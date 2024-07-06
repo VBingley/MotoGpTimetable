@@ -11,8 +11,8 @@ android {
         applicationId "nl.bingley.motogptimetable"
         minSdkVersion 27
         targetSdkVersion 34
-        versionCode 1
-        versionName "1.0.3"
+        versionCode 2 // Increment with each release
+        versionName "1.0.4"
 
         testInstrumentationRunner "de.mannodermaus.junit5.AndroidJUnit5"
     }
