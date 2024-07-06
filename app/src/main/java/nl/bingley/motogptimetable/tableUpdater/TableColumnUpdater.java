@@ -42,9 +42,9 @@ public class TableColumnUpdater {
         } else {
             numberTextView = TableUpdaterHelper.createRiderTextView(riderDetails.getConstructor(), context);
         }
-        if (riderDetails != null && riderDetails.getColor() != null && riderDetails.getTextColor() != null) {
-            numberTextView.setBackgroundColor(Color.parseColor(riderDetails.getColor()));
-            numberTextView.setTextColor(Color.parseColor(riderDetails.getTextColor()));
+        if (riderDetails != null && riderDetails.getColorHex() != null && riderDetails.getTextColorHex() != null) {
+            numberTextView.setBackgroundColor(riderDetails.getColor());
+            numberTextView.setTextColor(riderDetails.getTextColor());
         }
 
         numberTextView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
@@ -73,7 +73,7 @@ public class TableColumnUpdater {
         TextView textView = TableUpdaterHelper.createRiderTextView(lapTime, context);
         if (rider.hasFastestLap() && rider.hasRecentlyImprovedBestTime() && tableData.getCategory().getType() == SessionType.Race) {
             textView.setBackgroundColor(TableUpdaterHelper.RED);
-        } else if(rider.hasRecentlyImprovedBestTime() && tableData.getCategory().getType() == SessionType.Race) {
+        } else if (rider.hasRecentlyImprovedBestTime() && tableData.getCategory().getType() == SessionType.Race) {
             textView.setBackgroundColor(TableUpdaterHelper.ORANGE);
         }
 

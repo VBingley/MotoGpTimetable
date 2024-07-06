@@ -20,6 +20,8 @@ public class Category {
     private String duration;
     @JsonProperty("remaining")
     private String remaining;
+    @JsonProperty("num_laps")
+    private String numLaps;
 
     public int getId() {
         return id;
@@ -48,6 +50,34 @@ public class Category {
 
     public String getRemaining() {
         return remaining;
+    }
+
+    public String getNumLaps() {
+        return numLaps;
+    }
+
+    public int getDurationInt() {
+        try {
+            return Integer.parseInt(duration);
+        } catch (Exception ex) {
+            return 0;
+        }
+    }
+
+    public int getRemainingInt() {
+        try {
+            return Integer.parseInt(remaining);
+        } catch (Exception ex) {
+            return 0;
+        }
+    }
+
+    public int getNumLapsInt() {
+        try {
+            return Integer.parseInt(numLaps);
+        } catch (Exception ex) {
+            return 0;
+        }
     }
 
     public SessionType getType() {

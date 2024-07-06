@@ -169,7 +169,7 @@ public class DataUpdater extends Thread {
     }
 
     private static void SetNewRiderBestTime(Rider newRider, Rider oldRider, Category category) {
-        if (category.getType() == SessionType.Race && Integer.parseInt(category.getRemaining()) <= Integer.parseInt(category.getDuration()) - 2) {
+        if (!category.isSessionFinished() && category.getType() == SessionType.Race && category.getRemainingInt() <= category.getNumLapsInt() - 2) {
             newRider.setBestTime("");
         } else {
             newRider.setLastBestTimeChange(LocalDateTime.now());

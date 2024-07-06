@@ -80,10 +80,9 @@ public class TableUpdater extends Thread {
         switch (category.getType()) {
             case Practice:
             case Qualifying:
-                int remaining = Integer.parseInt(category.getRemaining());
-                return sessionRemainingCounter.getRemainingString(remaining) + " remaining";
+                return sessionRemainingCounter.getRemainingString(category.getRemainingInt()) + " remaining";
             case Race:
-                return category.getRemaining() + "/" + category.getDuration() + " laps remaining";
+                return category.getRemaining() + "/" + category.getNumLaps() + " laps remaining";
             default:
                 return "";
         }
@@ -93,10 +92,10 @@ public class TableUpdater extends Thread {
         switch (category.getType()) {
             case Practice:
             case Qualifying:
-                int remaining = Integer.parseInt(category.getRemaining());
+                int remaining = category.getRemainingInt();
                 return sessionRemainingCounter.buildString(remaining);
             case Race:
-                return category.getDuration() + " laps";
+                return category.getNumLaps() + " laps";
             default:
                 return "";
         }

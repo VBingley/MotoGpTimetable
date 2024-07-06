@@ -1,5 +1,7 @@
 package nl.bingley.motogptimetable.model;
 
+import android.graphics.Color;
+
 import nl.bingley.motogptimetable.model.details.RiderInfo;
 
 public class RiderDetails {
@@ -42,11 +44,27 @@ public class RiderDetails {
         return constructor;
     }
 
-    public String getColor() {
+    public String getColorHex() {
         return color;
     }
 
-    public String getTextColor() {
+    public int getColor() {
+        try {
+            return Color.parseColor(color);
+        } catch (Exception ex) {
+            return Color.BLACK;
+        }
+    }
+
+    public String getTextColorHex() {
         return textColor;
+    }
+
+    public int getTextColor() {
+        try {
+            return Color.parseColor(textColor);
+        } catch (Exception ex) {
+            return Color.WHITE;
+        }
     }
 }
