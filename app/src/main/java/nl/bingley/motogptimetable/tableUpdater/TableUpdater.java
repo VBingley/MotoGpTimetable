@@ -147,11 +147,11 @@ public class TableUpdater extends Thread {
 
     private void setRowBackgroundColor(TableRow row, Rider rider) {
         if (rider.hasRecentlyCrashed()) {
-            row.setBackgroundColor(TableUpdaterHelper.ORANGE);
+            row.setBackgroundColor(TableUpdaterHelper.ROW_ORANGE);
         } else if (rider.hasRecentlyGainedPosition()) {
-            row.setBackgroundColor(TableUpdaterHelper.GREEN);
+            row.setBackgroundColor(TableUpdaterHelper.ROW_GREEN);
         } else if (rider.hasRecentlyLostPosition()) {
-            row.setBackgroundColor(TableUpdaterHelper.RED);
+            row.setBackgroundColor(TableUpdaterHelper.ROW_RED);
         }
     }
 

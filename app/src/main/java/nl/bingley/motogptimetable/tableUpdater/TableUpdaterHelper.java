@@ -14,9 +14,11 @@ public class TableUpdaterHelper {
 
     private static final int TEXT_SIZE = 16;
 
-    public static final int GREEN = Color.argb(51, 0, 255, 0);
-    public static final int RED = Color.argb(51, 255, 0, 0);
-    public static final int ORANGE = Color.argb(51, 255, 165, 0);
+    public static final int ROW_GREEN = Color.argb(51, 0, 255, 0);
+    public static final int ROW_RED = Color.argb(51, 255, 0, 0);
+    public static final int ROW_ORANGE = Color.argb(51, 255, 165, 0);
+    public static final int TEXT_RED = Color.RED;
+    public static final int TEXT_ORANGE = Color.argb(255, 255, 165, 0);
 
     public static TextView createRiderTextView(String message, Context context) {
         TextView text = new TextView(context);
