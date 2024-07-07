@@ -70,7 +70,7 @@ public class TableColumnUpdater {
             lapTime = rider.getLastTime();
         }
         TextView textView = TableUpdaterHelper.createRiderTextView(lapTime, context);
-        if (rider.hasFastestLap()) {
+        if ((rider.hasFastestLap() && tableData.isColumnLapTimeTypeBest()) || (rider.hasFastestLap() && rider.getLastTime().equals(rider.getBestTime()))) {
             textView.setTextColor(Constants.TEXT_RED);
         } else if (rider.hasRecentlyImprovedBestTime()) {
             textView.setTextColor(Constants.TEXT_ORANGE);

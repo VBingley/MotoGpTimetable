@@ -1,6 +1,8 @@
 package nl.bingley.motogptimetable;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import android.net.Uri;
 import android.text.TextUtils;
@@ -62,6 +64,15 @@ public class DataUpdaterUnitTest {
 
         Collection<Rider> riders = tableData.getRiders();
         assertEquals(17, riders.size());
+
+        Rider rider = riders.stream().filter(r -> r.getNumber() == 4).findFirst().orElse(new Rider());
+        assertEquals(1, rider.getPosition());
+        assertEquals(4, rider.getNumber());
+        assertEquals("Hector", rider.getName());
+        assertEquals("GARZO", rider.getSurname());
+        assertTrue(rider.hasFastestLap());
+        assertFalse(rider.hasRecentlyGainedPosition());
+        assertFalse(rider.isInPit());
     }
 
     @Test
