@@ -46,13 +46,13 @@ public class DataUpdater extends Thread {
             StringRequest stringRequest = new StringRequest(Request.Method.GET, liveTimingUrl,
                     this::handleLiveTimingResponse,
                     error -> tableData.setError("Error requesting live-timing data! " + error.getMessage()));
-            stringRequest.setRetryPolicy(new DefaultRetryPolicy(2500, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+            stringRequest.setRetryPolicy(new DefaultRetryPolicy(Constants.RETRY_DELAY, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
             new Thread(() -> {
                 while (!Thread.interrupted()) {
                     try {
                         queue.add(stringRequest);
-                        Thread.sleep(2500L);
+                        Thread.sleep(Constants.RETRY_DELAY);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -64,7 +64,7 @@ public class DataUpdater extends Thread {
         }
     }
 
-    private void handleLiveTimingResponse(String response) {
+    protected void handleLiveTimingResponse(String response) {
         try {
             LapTimes lapTimes = new ObjectMapper().readValue(response, LapTimes.class);
             Category oldCategory = tableData.getCategory();
@@ -102,7 +102,7 @@ public class DataUpdater extends Thread {
     private void fetchRiderDetails() {
         StringRequest stringRequest = new StringRequest(Request.Method.GET, detailsBaseUrl + tableData.getCategory().getYear() + seasonUrl,
                 this::handleSeasonResponse, error -> tableData.setError("Error requesting championship data!"));
-        stringRequest.setRetryPolicy(new DefaultRetryPolicy(2500, 10, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(Constants.RETRY_DELAY, 10, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         queue.add(stringRequest);
     }
 
@@ -117,7 +117,7 @@ public class DataUpdater extends Thread {
             if (currentSeason.isPresent()) {
                 StringRequest stringRequest = new StringRequest(Request.Method.GET, detailsBaseUrl + category.getYear() + riderInfoUrl + currentSeason.get().getId(),
                         this::handleRiderInfoResponse, error -> tableData.setError("Error requesting rider details data!"));
-                stringRequest.setRetryPolicy(new DefaultRetryPolicy(2500, 10, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+                stringRequest.setRetryPolicy(new DefaultRetryPolicy(Constants.RETRY_DELAY, 10, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
                 queue.add(stringRequest);
             } else {
                 tableData.setError("Team colors are not available for " + category.getName());
@@ -169,7 +169,8 @@ public class DataUpdater extends Thread {
     }
 
     private static void SetNewRiderBestTime(Rider newRider, Rider oldRider, Category category) {
-        if (!category.isSessionFinished() && category.getType() == SessionType.Race && category.getRemainingInt() >= category.getNumLapsInt() - 2) {
+        int minLapsDone = 2;
+        if (!category.isSessionFinished() && category.IsRace() && category.getRemainingInt() > category.getNumLapsInt() - minLapsDone) {
             newRider.setBestTime("");
         } else {
             newRider.setLastBestTimeChange(LocalDateTime.now());

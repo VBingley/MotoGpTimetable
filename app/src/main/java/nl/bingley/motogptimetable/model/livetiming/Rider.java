@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.LocalDateTime;
 
+import nl.bingley.motogptimetable.Constants;
 import nl.bingley.motogptimetable.tableUpdater.TableUpdaterHelper;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -46,8 +47,8 @@ public class Rider {
     public Rider() {
         hasFastestLap = false;
         positionChangeDirection = positionChangeDirectionType.GAINED;
-        lastPositionChange = LocalDateTime.now().minusSeconds(TableUpdaterHelper.highlightTimeout);
-        lastBestTimeChange = LocalDateTime.now().minusSeconds(TableUpdaterHelper.highlightTimeout);
+        lastPositionChange = LocalDateTime.now().minusSeconds(Constants.HIGHLIGHT_TIMEOUT);
+        lastBestTimeChange = LocalDateTime.now().minusSeconds(Constants.HIGHLIGHT_TIMEOUT);
     }
 
     public int getId() {
@@ -149,6 +150,6 @@ public class Rider {
     }
 
     private boolean isChangeRecent(LocalDateTime lastChange) {
-        return LocalDateTime.now().minusSeconds(TableUpdaterHelper.highlightTimeout).isBefore(lastChange);
+        return LocalDateTime.now().minusSeconds(Constants.HIGHLIGHT_TIMEOUT).isBefore(lastChange);
     }
 }

@@ -8,6 +8,7 @@ import androidx.appcompat.widget.Toolbar;
 
 import com.google.android.material.snackbar.Snackbar;
 
+import nl.bingley.motogptimetable.Constants;
 import nl.bingley.motogptimetable.MainActivity;
 import nl.bingley.motogptimetable.SessionRemainingCounter;
 import nl.bingley.motogptimetable.TableData;
@@ -147,11 +148,11 @@ public class TableUpdater extends Thread {
 
     private void setRowBackgroundColor(TableRow row, Rider rider) {
         if (rider.hasRecentlyCrashed()) {
-            row.setBackgroundColor(TableUpdaterHelper.ROW_ORANGE);
+            row.setBackgroundColor(Constants.ROW_ORANGE);
         } else if (rider.hasRecentlyGainedPosition()) {
-            row.setBackgroundColor(TableUpdaterHelper.ROW_GREEN);
+            row.setBackgroundColor(Constants.ROW_GREEN);
         } else if (rider.hasRecentlyLostPosition()) {
-            row.setBackgroundColor(TableUpdaterHelper.ROW_RED);
+            row.setBackgroundColor(Constants.ROW_RED);
         }
     }
 

@@ -94,6 +94,10 @@ public class Category {
         }
     }
 
+    public boolean IsRace() {
+        return getType() == SessionType.Race;
+    }
+
     public boolean isSessionStarted() {
         return "S".equals(sessionStatus);
     }

@@ -7,6 +7,7 @@ import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 
+import nl.bingley.motogptimetable.Constants;
 import nl.bingley.motogptimetable.TableData;
 import nl.bingley.motogptimetable.model.RiderDetails;
 import nl.bingley.motogptimetable.model.livetiming.Rider;
@@ -69,10 +70,10 @@ public class TableColumnUpdater {
             lapTime = rider.getLastTime();
         }
         TextView textView = TableUpdaterHelper.createRiderTextView(lapTime, context);
-        if ((rider.hasFastestLap() && tableData.isColumnLapTimeTypeBest()) || (rider.hasFastestLap()) && rider.hasRecentlyImprovedBestTime()) {
-            textView.setTextColor(TableUpdaterHelper.TEXT_RED);
+        if (rider.hasFastestLap()) {
+            textView.setTextColor(Constants.TEXT_RED);
         } else if (rider.hasRecentlyImprovedBestTime()) {
-            textView.setTextColor(TableUpdaterHelper.TEXT_ORANGE);
+            textView.setTextColor(Constants.TEXT_ORANGE);
         }
 
         return textView;
